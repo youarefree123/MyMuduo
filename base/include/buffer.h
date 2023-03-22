@@ -1,9 +1,6 @@
-#ifndef __BUFFER__H__
-#define __BUFFER__H__
+#pragma once
 
 #include "storage_block.h"
-#include <deque>
-#include <string>
 #define TOKEN_SIZE 4048
 
 // 无限制字符流
@@ -49,5 +46,3 @@ class Buffer {
     size_t read_fd( int fd ) ;
     size_t write_fd( int fd ) ;
 };
-
-#endif 

@@ -1,5 +1,5 @@
-#ifndef __STORAGE__BLOCK__H__
-#define __STORAGE__BLOCK__H__
+#pragma once
+
 
 // #include <algorithm>
 #include <deque>
@@ -107,4 +107,3 @@ class BlockViewList {
     std::vector<iovec> as_iovecs() const;
 };
 
-#endif  

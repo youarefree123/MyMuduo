@@ -8,10 +8,10 @@ message("base---${PROJECT_SOURCE_DIR}")
 
 add_library(
         base 
-        STATIC
+        SHARED
         ${SRC_DIR_LIST}									
 ) 
 
 target_include_directories(base PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_subdirectory ("tests") # 指定 编译子目录
+# add_subdirectory ("tests") # 指定 编译子目录

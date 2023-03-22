@@ -1,6 +1,5 @@
-#include"buffer.h"
-#include "sqlconnpool.h"
-#include "sqlconnRAII.h"
+#include "buffer.h"
+#include "noncopyable.h"
 
 // #include <deque>
 // #include <iostream>

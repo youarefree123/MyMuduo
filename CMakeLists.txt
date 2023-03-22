@@ -5,10 +5,11 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(${PROJECT_NAME})
 
-# 指定头文件搜索路径
-# include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
+# 指定头文件搜索路径（动态库需要？？）
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
 
 add_subdirectory ("base") # 指定 编译子目录
+add_subdirectory ("net") # 指定 编译子目录
 
 
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/bin")

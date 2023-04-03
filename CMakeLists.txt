@@ -31,20 +31,16 @@ add_executable(${PROJECT_NAME}  main.cpp)
 # 指定链接库
 target_link_libraries(
   ${PROJECT_NAME} PUBLIC 
-  base 
+  net 
   ) 
 
 # 指定头文件
 target_include_directories (
   ${PROJECT_NAME} PUBLIC 
   ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/spdlog/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/base/include
+  # ${CMAKE_CURRENT_SOURCE_DIR}/base/include
   
 )
-
-# add_executable(test_btye_stream  test_btye_stream.cpp)
-# target_link_libraries(test_btye_stream base ) 
-
 
 
 

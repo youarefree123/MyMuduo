@@ -1,16 +1,16 @@
-// #include "buffer.h"
-// #include <iostream>
-// using namespace std;
+#include "buffer.h"
+#include <iostream>
+using namespace std;
 
-// int main(int argc, char const *argv[])
-// {
-//   Buffer bs{};
-//   bs.has_write( "1111" );
-//   bs.has_write("2222");
-//   string str = bs.has_read( 3 );
-//   cout<<str<<endl;
+int main(int argc, char const *argv[])
+{
+  Buffer bs{};
+  bs.HasWrite( "1111" );
+  bs.HasWrite("2222");
+  string str = bs.HasRead( 3 );
+  cout<<str<<endl;
 
-//   str = bs.has_read( 3 );
-//   cout<<str<<endl;
-//   return 0;
-// }
+  str = bs.HasRead( 3 );
+  cout<<str<<endl;
+  return 0;
+}

@@ -1,20 +1,33 @@
-# cmake_minimum_required(VERSION 3.20)
-# set(CMAKE_CXX_STANDARD 17)
+cmake_minimum_required(VERSION 3.20)
+set(CMAKE_CXX_STANDARD 17)
 
-
-# set(LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../lib")
+set(LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../lib")
+# 遍历当前目录和子目录
 # file(GLOB_RECURSE SRC_DIR_LIST "./*.cpp")
-# message("base---${PROJECT_SOURCE_DIR}")
 
-# add_library(
-#         net 
-#         STATIC
-#         ${SRC_DIR_LIST}									
-# ) 
+# 只遍历当前目录
+file(GLOB  SRC_DIR_LIST "./*.cpp")
+message("net---${PROJECT_SOURCE_DIR}")
 
-# target_include_directories(net PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-# target_link_libraries(net base )
+add_library(
+        net 
+        SHARED
+        ${SRC_DIR_LIST}									
+) 
+
+target_include_directories (
+  net PUBLIC 
+  ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/spdlog/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+# 指定链接库
+target_link_libraries(
+  net PUBLIC 
+  base 
+  ) 
 
 
+add_subdirectory (tests) # 指定 编译子目录
 
-# # add_subdirectory ("tests") # 指定 编译子目录
+

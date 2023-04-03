@@ -1,13 +1,10 @@
 #include "buffer.h"
 #include "noncopyable.h"
-#include "poller.h"
-#include "channel.h"
 #include "log.h"
-// #include <deque>
-// #include <iostream>
+
 using namespace std;
 
-int main(int argc, char const *argv[])
+int main()
 {
   // srcDir_ = getcwd(nullptr, 256);
   Buffer b{};

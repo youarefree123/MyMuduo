@@ -16,33 +16,33 @@ class Buffer {
 
   public:
     Buffer();
-    size_t has_write(const std::string &data);
+    size_t HasWrite(const std::string &data);
     // size_t remaining_capacity() const;
     // 设置写结束
-    void end_input();
+    void EndInput();
     void set_error() { _error = true; }
   
     // 取前len个字符
-    std::string peek_output(const size_t len) const;
-    void pop_output(const size_t len);
+    std::string PeekOutput(const size_t len) const;
+    void PopOutput(const size_t len);
 
-    std::string has_read(const size_t len) {
-        const auto ret = peek_output(len);
-        pop_output(len);
+    std::string HasRead(const size_t len) {
+        const auto ret = PeekOutput(len);
+        PopOutput(len);
         return ret;
     }
 
     // 判断时候还能读
-    bool input_ended() const;
+    bool InputEnded() const;
     bool error() const { return _error; }
     size_t size() const;
-    bool buffer_empty() const;
+    bool BufferEmpty() const;
     bool eof() const;
     // 已写数
-    size_t bytes_written() const;
+    size_t BytesWritten() const;
     // 已读数
-    size_t bytes_read() const;
+    size_t BytesRead() const;
 
-    size_t read_fd( int fd ) ;
-    size_t write_fd( int fd ) ;
+    size_t ReadFd( int fd ) ;
+    size_t WriteFd( int fd ) ;
 };

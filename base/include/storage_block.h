@@ -44,11 +44,11 @@ class Block {
 
     //! \brief Discard the first `n` bytes of the string (does not require a copy or move)
     //! \note Doesn't free any memory until the whole string has been discarded in all copies of the Block.
-    void remove_prefix(const size_t n);
+    void RemovePrefix(const size_t n);
 };
 
 
-// 组织block的List，对外提供接口实现append block和remove n个字符
+// 组织block的List，对外提供接口实现Append block和remove n个字符
 class BlockList {
   private:
     std::deque<Block> _blocks{};
@@ -58,28 +58,28 @@ class BlockList {
     BlockList(Block block) : _blocks{block} {}
 
     // BlockList 可以由block 构造出来
-    // 所以下面的append参数列表只需要有BlockList
+    // 所以下面的Append参数列表只需要有BlockList
     BlockList(std::string &&str) noexcept {
         Block blk{std::move(str)};
-        append(blk);
+        Append(blk);
     }
 
     const std::deque<Block> &blocks() const { return _blocks; }
-    void append(const BlockList &other);
+    void Append(const BlockList &other);
   
     // 可以直接将一个BlockList转成Block??
     operator Block() const;
 
     // 同样是移除前n个字符
-    void remove_prefix(size_t n);
+    void RemovePrefix(size_t n);
 
     size_t size() const;
 
     // 这个强转成Block的时候会用到吧
-    std::string concatenate() const;
+    std::string Concatenate() const;
 
     // 只合并前n个字节
-    std::string concatenate(size_t n) const;
+    std::string Concatenate(size_t n) const;
 
     // 转成iovece 数组用于分散读
     std::vector<iovec> as_iovecs() const;
@@ -99,7 +99,7 @@ class BlockViewList {
 
     BlockViewList(std::string_view str) { _views.push_back({const_cast<char *>(str.data()), str.size()}); }
     
-    void remove_prefix(size_t n);
+    void RemovePrefix(size_t n);
 
     size_t size() const;
 

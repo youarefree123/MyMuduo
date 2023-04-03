@@ -2,9 +2,9 @@
 #include <stdexcept>
 using namespace std;
 
-void Block::remove_prefix(const size_t n) {
+void Block::RemovePrefix(const size_t n) {
     if (n > str().size()) {
-        throw out_of_range("Block::remove_prefix");
+        throw out_of_range("Block::RemovePrefix");
     }
     _starting_offset += n;
     // 如果这个block 已经用完，将该指针置空,引用计数-1(其实就是释放了)
@@ -13,7 +13,7 @@ void Block::remove_prefix(const size_t n) {
     }
 }
 
-void BlockList::append(const BlockList &other) {
+void BlockList::Append(const BlockList &other) {
     for (const auto &blk : other._blocks) {
         _blocks.push_back(blk);
     }
@@ -27,14 +27,14 @@ BlockList::operator Block() const {
         case 1:
             return _blocks[0];
         default: {
-            return Block( concatenate() );
+            return Block( Concatenate() );
             // throw runtime_error(
-            //     "BlockList: please use concatenate() to combine a multi-Block BlockList into one Block");
+            //     "BlockList: please use Concatenate() to combine a multi-Block BlockList into one Block");
         }
     }
 }
 
-string BlockList::concatenate() const {
+string BlockList::Concatenate() const {
     std::string ret;
     ret.reserve(size());
     for (const auto &blk : _blocks) {
@@ -44,7 +44,7 @@ string BlockList::concatenate() const {
 }
 
 // blk.str() 是string_view,只有在合并的时候才会拷贝
-string BlockList::concatenate(size_t n) const {
+string BlockList::Concatenate(size_t n) const {
     std::string ret;
     ret.reserve(n);
     for (const auto &blk : _blocks) {
@@ -66,14 +66,14 @@ size_t BlockList::size() const {
     return ret;
 }
 
-void BlockList::remove_prefix(size_t n) {
+void BlockList::RemovePrefix(size_t n) {
     while (n > 0) {
         if (_blocks.empty()) {
-            throw std::out_of_range("BlockList::remove_prefix");
+            throw std::out_of_range("BlockList::RemovePrefix");
         }
 
         if (n < _blocks.front().str().size()) {
-            _blocks.front().remove_prefix(n);
+            _blocks.front().RemovePrefix(n);
             n = 0;
         } else {
             n -= _blocks.front().str().size();
@@ -95,10 +95,10 @@ BlockViewList::BlockViewList(const BlockList &blocks) {
     }
 }
 
-void BlockViewList::remove_prefix(size_t n) {
+void BlockViewList::RemovePrefix(size_t n) {
     while (n > 0) {
         if (_views.empty()) {
-            throw std::out_of_range("BlockListView::remove_prefix");
+            throw std::out_of_range("BlockListView::RemovePrefix");
         }
 
         if (n < _views.front().size()) {

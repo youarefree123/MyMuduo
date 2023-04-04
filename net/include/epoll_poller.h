@@ -1,10 +1,9 @@
 #pragma once 
 
 #include <vector>
-#include <sys/epoll.h>
+#include "poller.h"
 
-class Poller;
-class EventLoop;
+struct epoll_event;
 
 class EpollPoller
 {
@@ -22,11 +21,12 @@ private:
   void FillActiveChannels( int num_events, ChannelList* active_channels ) const;
   // 更新channel的事件
   void Update( int operation, Channel* channel );
+  const char* OperationToString( int op ) const;
 
 
   int epollfd_;
   using EventList = std::vector<struct epoll_event>;
-  EventList events_;
+  EventList events_list_;   // 保存所监听的fd返回的事件
 };
 
 

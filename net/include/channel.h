@@ -1,10 +1,13 @@
 #pragma once
 
+#include <functional>
+#include <memory>
+#include <string>
+using std::string;
+
 #include "noncopyable.h"
 #include "timestamp.h"
 
-#include <functional>
-#include <memory>
 class EventLoop;
 
 
@@ -62,8 +65,8 @@ public:
   bool IsReading() const { return events_ & kWriteEvent; }
   bool IsWriting() const { return events_ & kReadEvent; }
 
-  int index() { return index_; }
-  void set_index( int idx ) { index_ = idx; }
+  int fd_status() { return fd_status_; }
+  void set_fd_status( int idx ) { fd_status_ = idx; }
 
   // 返回Channel所属的loop
   EventLoop* owner_loop() const { return loop_; }  
@@ -74,16 +77,20 @@ public:
   // 限时完成一个任务？？
   void HandleEventWithGuard( Timestamp recetive_time ); 
 
+  string EventsToString(int ev);
+
+
+
 private:
   static const int kNoneEvent;
   static const int kReadEvent ; // 读事件 , 当有带外数据时候触发 EPOLLPRI 
   static const int kWriteEvent;
 
-  const int fd_;  // 绑定的fd
+  const int fd_;    // 绑定的fd
   EventLoop* loop_; // 绑定的loop
-  int events_;     // 已注册的fd感兴趣事件
-  int revents_;   // poller返回的已触发的事件
-  int index_ ; // 不知道干啥
+  int events_;      // 已注册的fd感兴趣事件
+  int revents_;     // poller返回的已触发的事件
+  int fd_status_ ;  // 保存fd当前状态：已监听、未监听、已移除
 
   // 防止Channel被手动remove后还在使用，tie进行跨线程的生存状态监听
   std::weak_ptr<void> tie_; 

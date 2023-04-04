@@ -13,7 +13,7 @@ Channel::Channel( EventLoop* loop, size_t fd )
     fd_( fd ),
     events_( kNoneEvent ),
     revents_( kNoneEvent ),
-    index_( -1 ),
+    fd_status_( -1 ),
     tied_ ( false )  {}
 // 原版全是判断Channel是否有回调执行和Channel是否属于当前loop的断言
 
@@ -67,4 +67,22 @@ void Channel::HandleEventWithGuard( Timestamp receive_time ) {
     if( write_callback_ ) write_callback_();
   }
 
+}
+
+string Channel::EventsToString(int ev)
+{
+  std::ostringstream oss;
+  if (ev & EPOLLIN)
+    oss << "IN ";
+  if (ev & EPOLLPRI)
+    oss << "PRI ";
+  if (ev & EPOLLOUT)
+    oss << "OUT ";
+  if (ev & EPOLLHUP)
+    oss << "HUP ";
+  if (ev & EPOLLRDHUP)
+    oss << "RDHUP ";
+  if (ev & EPOLLERR)
+    oss << "ERR ";
+  return oss.str();
 }

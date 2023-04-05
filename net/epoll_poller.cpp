@@ -141,6 +141,18 @@ const char* EpollPoller::OperationToString( int op ) const{
 }
 
 
+void FillActiveChannels( int num_events, ChannelList* active_channels ) const {
+  assert( num_events <= events_list_.size() );
+  for( int i = 0; i < num_events; i++ ) {
+    Channel* channel = static_cast< Channel* > ( events_list_[i].data.ptr );
+    assert( channels_.find( channel ) != channels_.end() );
+
+    channel->set_revents( events_lists_[i].events );
+    active_channels->push_back(channel); 
+  }
+}
+
+
 Poller* Poller::NewPoller( EventLoop* loop ) {
   return new EpollPoller( loop );
 }

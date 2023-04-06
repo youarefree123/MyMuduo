@@ -9,6 +9,8 @@ set(LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../lib")
 file(GLOB  SRC_DIR_LIST "./*.cpp")
 message("base---${PROJECT_SOURCE_DIR}")
 
+
+
 add_library(
         base 
         SHARED

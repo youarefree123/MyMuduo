@@ -5,9 +5,10 @@
 
 struct epoll_event;
 
-class EpollPoller
+class EpollPoller : public Poller
 {
 public:
+  using ChannelList = std::vector<Channel*>;
   EpollPoller(EventLoop* loop);
   ~EpollPoller() override ;
 

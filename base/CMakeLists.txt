@@ -10,7 +10,6 @@ file(GLOB  SRC_DIR_LIST "./*.cpp")
 message("base---${PROJECT_SOURCE_DIR}")
 
 
-
 add_library(
         base 
         SHARED
@@ -22,6 +21,13 @@ target_include_directories (
   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/spdlog/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+
+target_link_libraries(
+  base
+  pthread
+) 
+
 
 add_subdirectory (tests) # 指定 编译子目录
 

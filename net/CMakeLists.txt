@@ -9,9 +9,6 @@ set(LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../lib")
 file(GLOB  SRC_DIR_LIST "./*.cpp")
 message("net---${PROJECT_SOURCE_DIR}")
 
-find_package(Threads REQUIRED)
-
-
 
 
 add_library(
@@ -28,9 +25,8 @@ target_include_directories (
 
 # 指定链接库
 target_link_libraries(
-  net PUBLIC 
+  net PUBLIC
   base 
-  Threads::Threads
   ) 
 
 add_subdirectory (tests) # 指定 编译子目录

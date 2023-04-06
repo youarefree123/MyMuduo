@@ -1,9 +1,9 @@
-#include "timestamp.h"
 #include <chrono>
 #include <sstream>
 #include <inttypes.h>
 #include <iomanip>
 #include <sys/time.h>
+#include "timestamp.h"
 
 const size_t kMicroSecondsPerSecond = 1e6;
 

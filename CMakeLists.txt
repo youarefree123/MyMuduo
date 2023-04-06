@@ -20,7 +20,7 @@ project(${PROJECT_NAME})
 
 
 add_subdirectory ("base") # 指定 编译子目录
-# add_subdirectory ("net") # 指定 编译子目录
+add_subdirectory ("net") # 指定 编译子目录
 
 
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/bin")
@@ -28,11 +28,6 @@ set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 # 指定可执行文件名及源码
 add_executable(${PROJECT_NAME}  main.cpp)
 
-# 指定链接库
-target_link_libraries(
-  ${PROJECT_NAME} PUBLIC 
-  net 
-  ) 
 
 # 指定头文件
 target_include_directories (
@@ -41,6 +36,20 @@ target_include_directories (
   # ${CMAKE_CURRENT_SOURCE_DIR}/base/include
   
 )
+
+
+# 指定链接库
+target_link_libraries(
+  ${PROJECT_NAME} PUBLIC 
+  net 
+  ) 
+  
+# target_link_libraries(
+#   ${PROJECT_NAME} PUBLIC 
+#   base 
+#   ) 
+
+
 
 
 

@@ -1,3 +1,4 @@
+
 #include <strings.h>
 #include <assert.h>
 #include <sys/epoll.h>
@@ -174,4 +175,3 @@ void EpollPoller::FillActiveChannels( int num_events, ChannelList* active_channe
 
 Poller* Poller::NewPoller( EventLoop* loop ) {
     return new EpollPoller( loop );
-}

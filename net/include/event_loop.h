@@ -5,6 +5,7 @@
 #include <mutex>
 #include <functional>
 
+#include "current_thread.h"
 #include "timestamp.h"
 #include "noncopyable.h"
 
@@ -44,8 +45,15 @@ public:
     }
     // 断言，确认loop是否在对应线程里
     void AssertInLoopThread() {
-        if( !IsIn )
+        if( !IsInLoopThread() ) {
+            AbortNotInLoopThread();
+        }
     }
+    bool EventHandling() const {
+        return event_handling_;
+    }
+    // 为什么要设置成静态的?
+    static EventLoop* GetEventLoopOfCurrentThread();
 
 private:
     using ChannelList = std::vector<Channel*>;

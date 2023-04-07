@@ -48,18 +48,3 @@ target_link_libraries(
 #   ${PROJECT_NAME} PUBLIC 
 #   base 
 #   ) 
-
-
-
-
-
-
-
-# ADD_SUBDIRECTORY(base/)
-
-
-
-
-# include_directories(   													
-#         base/
-# )

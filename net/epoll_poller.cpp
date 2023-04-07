@@ -175,3 +175,4 @@ void EpollPoller::FillActiveChannels( int num_events, ChannelList* active_channe
 
 Poller* Poller::NewPoller( EventLoop* loop ) {
     return new EpollPoller( loop );
+}

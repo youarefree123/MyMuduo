@@ -20,44 +20,44 @@ EpollPoller::EpollPoller( EventLoop* loop )
     epollfd_( ::epoll_create1( EPOLL_CLOEXEC ) ),
     events_list_( kInitEventListSize) 
 {
-  if( epollfd_ < 0 ) {
-    CRITICAL( "EpollPoller::EpollPoller" );
-  }
+    if( epollfd_ < 0 ) {
+        CRITICAL( "EpollPoller::EpollPoller" );
+    }
 }
 
 EpollPoller::~EpollPoller(){ ::close( epollfd_ ); }
 
 
 Timestamp EpollPoller::Poll( int timeout_ms, ChannelList* active_channels ) {
-  // events_list_.size() 构造时候初始是16，后面会动态扩容？！
-  TRACE( "fd total count:{}",channels_.size() );
-  int num_events = ::epoll_wait( epollfd_,
-                                &*events_list_.begin(),
-                                static_cast<int>(events_list_.size()),
-                                timeout_ms );
-  int saved_errno = errno;
-  Timestamp now { Timestamp::Now() };
+    // events_list_.size() 构造时候初始是16，后面会动态扩容？！
+    TRACE( "fd total count:{}",channels_.size() );
+    int num_events = ::epoll_wait( epollfd_,
+                                    &*events_list_.begin(),
+                                    static_cast<int>(events_list_.size()),
+                                    timeout_ms );
+    int saved_errno = errno;
+    Timestamp now { Timestamp::Now() };
 
-  // 处理事件
-  if( num_events > 0 ) {
-    TRACE( "{} envents happened", num_events );  
-    FillActiveChannels( num_events, active_channels );
-    //  自适应，如果一次没有取完，会自动扩容
-    if( static_cast<size_t>( num_events ) == events_list_.size() ) {
-      events_list_.resize( events_list_.size() * 2 );
+    // 处理事件
+    if( num_events > 0 ) {
+        TRACE( "{} envents happened", num_events );  
+        FillActiveChannels( num_events, active_channels );
+        //  自适应，如果一次没有取完，会自动扩容
+        if( static_cast<size_t>( num_events ) == events_list_.size() ) {
+        events_list_.resize( events_list_.size() * 2 );
+        }
     }
-  }
-  else if( num_events == 0 ) {
-    TRACE( "Nothing happened." )
-  }
-  else {
-    // 如果不是被信号打断的，还进入了这个作用域，就说出出错了
-    if( saved_errno != EINTR ) {
-      errno = saved_errno;
-      ERROR( "EpollPoller::Poll" );
+    else if( num_events == 0 ) {
+        TRACE( "Nothing happened." )
     }
-  }
-  return now;
+    else {
+        // 如果不是被信号打断的，还进入了这个作用域，就说出出错了
+        if( saved_errno != EINTR ) {
+        errno = saved_errno;
+        ERROR( "EpollPoller::Poll" );
+        }
+    }
+    return now;
 
 }
 
@@ -66,40 +66,40 @@ Timestamp EpollPoller::Poll( int timeout_ms, ChannelList* active_channels ) {
   fd的之前状态不同，操作也不同
 */
 void EpollPoller::UpdateChannel( Channel* channel ) {
-  const int fd_status = channel->fd_status();
-  TRACE( "fd = {}, events = {}, fd_status = {}", \
-          channel->fd(), channel->events(), channel->fd_status() );
-  int fd = channel->fd();
-  // 未监听fd，或者是已删除监听的fd
-  // 问题：如果我add一个空事件会怎么样？
-  if( fd_status == KNew || fd_status == KDeleted ) {
-    if( fd_status == KNew ) {
-      assert( channels_.find( fd ) == channels_.end() );
-      channels_[fd] = channel;
-    } 
+    const int fd_status = channel->fd_status();
+    TRACE( "fd = {}, events = {}, fd_status = {}", \
+            channel->fd(), channel->events(), channel->fd_status() );
+    int fd = channel->fd();
+    // 未监听fd，或者是已删除监听的fd
+    // 问题：如果我add一个空事件会怎么样？
+    if( fd_status == KNew || fd_status == KDeleted ) {
+        if( fd_status == KNew ) {
+        assert( channels_.find( fd ) == channels_.end() );
+        channels_[fd] = channel;
+        } 
+        else {
+        assert( channels_.find( fd ) != channels_.end() );
+        assert ( channels_[fd] = channel );
+        }
+
+        channel->set_fd_status( KAdded );
+        Update( EPOLL_CTL_ADD, channel );
+    }
+    // 正常更新，可能会有删除操作
     else {
-      assert( channels_.find( fd ) != channels_.end() );
-      assert ( channels_[fd] = channel );
-    }
+        assert( channels_.find( fd ) != channels_.end() );
+        assert ( channels_[fd] = channel );
+        assert( fd_status == KAdded );
 
-    channel->set_fd_status( KAdded );
-    Update( EPOLL_CTL_ADD, channel );
-  }
-  // 正常更新，可能会有删除操作
-  else {
-    assert( channels_.find( fd ) != channels_.end() );
-    assert ( channels_[fd] = channel );
-    assert( fd_status == KAdded );
+        if( channel->IsNoneEvent() ) {
+        Update( EPOLL_CTL_DEL, channel );
+        channel->set_fd_status( KDeleted );
+        }
+        else {
+        Update( EPOLL_CTL_MOD, channel );
+        }
 
-    if( channel->IsNoneEvent() ) {
-      Update( EPOLL_CTL_DEL, channel );
-      channel->set_fd_status( KDeleted );
     }
-    else {
-      Update( EPOLL_CTL_MOD, channel );
-    }
-
-  }
 
 } 
 
@@ -107,71 +107,71 @@ void EpollPoller::UpdateChannel( Channel* channel ) {
  *  如果channel 此时监听空事件，就从ChannleMap中移除该channel
 */
 void EpollPoller::RemoveChannel( Channel* channel ) {
-  int fd = channel->fd();
-  TRACE( "fd = {}", fd );
-  assert(channels_.find(fd) != channels_.end());
-  assert(channels_[fd] == channel);
-  assert(channel->IsNoneEvent());
+    int fd = channel->fd();
+    TRACE( "fd = {}", fd );
+    assert(channels_.find(fd) != channels_.end());
+    assert(channels_[fd] == channel);
+    assert(channel->IsNoneEvent());
 
-  int fd_status = channel->fd_status();
-  assert( fd_status == KAdded || fd_status == KDeleted );
-  size_t num = channels_.erase( fd ); 
-  assert( num == 1 );
+    int fd_status = channel->fd_status();
+    assert( fd_status == KAdded || fd_status == KDeleted );
+    size_t num = channels_.erase( fd ); 
+    assert( num == 1 );
 
-  if( fd_status == KAdded ) {
-    Update( EPOLL_CTL_DEL, channel );
-  }
-  channel->set_fd_status( KNew );  
+    if( fd_status == KAdded ) {
+        Update( EPOLL_CTL_DEL, channel );
+    }
+    channel->set_fd_status( KNew );  
 }
 
 void EpollPoller::Update( int operation, Channel* channel) {
-  struct epoll_event event;
-  bzero( &event, sizeof(event) );
-  event.events = channel->events();
-  event.data.ptr = channel;
-  int fd = channel->fd();
-  TRACE( "EPOLL_CTL op = {}, fd = {}, event = {}",
-          OperationToString(operation),
-          channel->fd(), 
-          channel->EventsToString( channel->events() ) );
+    struct epoll_event event;
+    bzero( &event, sizeof(event) );
+    event.events = channel->events();
+    event.data.ptr = channel;
+    int fd = channel->fd();
+    TRACE( "EPOLL_CTL op = {}, fd = {}, event = {}",
+            OperationToString(operation),
+            channel->fd(), 
+            channel->EventsToString( channel->events() ) );
 
-  if( ::epoll_ctl( epollfd_, operation, fd, &event ) < 0 ) {
-    CRITICAL( "EpollPoller::Update( int operation, Channel* channel)" );
-  }
+    if( ::epoll_ctl( epollfd_, operation, fd, &event ) < 0 ) {
+        CRITICAL( "EpollPoller::Update( int operation, Channel* channel)" );
+    }
 
 } 
 
 
 const char* EpollPoller::OperationToString( int op ) const{
-  switch (op)
-  {
-    case EPOLL_CTL_ADD:
-      return "ADD";
-    case EPOLL_CTL_DEL:
-      return "DEL";
-    case EPOLL_CTL_MOD:
-      return "MOD";
-    default:
-      assert(false && "ERROR op");
-      return "Unknown Operation";
-  }
+    switch (op)
+    {
+        case EPOLL_CTL_ADD:
+            return "ADD";
+        case EPOLL_CTL_DEL:
+            return "DEL";
+        case EPOLL_CTL_MOD:
+            return "MOD";
+        default:
+            assert(false && "ERROR op");
+            return "Unknown Operation";
+    }
 }
 
 
 // 将所有的epoll_event 都转回 channel
 void EpollPoller::FillActiveChannels( int num_events, ChannelList* active_channels ) const {
-  assert( num_events <= events_list_.size() );
-  for( int i = 0; i < num_events; i++ ) {
-    Channel* channel = static_cast< Channel* > ( events_list_[i].data.ptr );
-    int fd = channel->fd();
-    assert( channels_.find( fd ) != channels_.end() );
+    assert( num_events <= events_list_.size() );
+    for( int i = 0; i < num_events; i++ ) {
+        Channel* channel = static_cast< Channel* > ( events_list_[i].data.ptr );
+        int fd = channel->fd();
+        assert( channels_.find( fd ) != channels_.end() );
 
-    channel->set_revents( events_list_[i].events );
-    active_channels->push_back(channel); 
-  }
+        channel->set_revents( events_list_[i].events );
+        active_channels->push_back(channel); 
+    }
 }
 
 
 Poller* Poller::NewPoller( EventLoop* loop ) {
-  return new EpollPoller( loop );
+    return new EpollPoller( loop );
 }

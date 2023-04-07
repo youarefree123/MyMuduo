@@ -1,18 +1,17 @@
 #pragma once 
 
-class EventLoop
+#include "noncopyable.h"
+
+class EventLoop : noncopyable
 {
+
+public: 
+  
+    EventLoop(/* args */);
+    ~EventLoop();
+
+
 private:
-  /* data */
-public:
-  EventLoop(/* args */);
-  ~EventLoop();
+
 };
 
-EventLoop::EventLoop(/* args */)
-{
-}
-
-EventLoop::~EventLoop()
-{
-}

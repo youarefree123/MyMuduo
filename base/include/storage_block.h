@@ -11,11 +11,11 @@
 
 // string的封装类，为了实现0拷贝
 class Block {
-  private:
+private:
     std::shared_ptr<std::string> _storage{}; 
     size_t _starting_offset{};
 
-  public:
+public:
     Block() = default;
 
     // 移动构造
@@ -50,9 +50,9 @@ class Block {
 
 // 组织block的List，对外提供接口实现Append block和remove n个字符
 class BlockList {
-  private:
+private:
     std::deque<Block> _blocks{};
-  public:
+public:
     BlockList() = default;
 
     BlockList(Block block) : _blocks{block} {}
@@ -89,7 +89,7 @@ class BlockList {
 class BlockViewList {
     std::deque<std::string_view> _views{};
 
-  public:
+public:
   // 构造
     BlockViewList(const std::string &str) : BlockViewList(std::string_view(str)) {}
 

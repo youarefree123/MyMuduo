@@ -5,7 +5,7 @@
 
 // 无限制字符流
 class Buffer {
-  private:
+private:
     BlockList _stream_buffer{};
     char _token[TOKEN_SIZE] ;
     size_t _size;
@@ -14,7 +14,7 @@ class Buffer {
     bool _input_ended;
     bool _error{};  //!< Flag indicating that the stream suffered an error.
 
-  public:
+public:
     Buffer();
     size_t HasWrite(const std::string &data);
     // size_t remaining_capacity() const;

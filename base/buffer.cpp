@@ -41,23 +41,23 @@ size_t Buffer::BytesWritten() const { return _nwritten; }
 size_t Buffer::BytesRead() const { return _nread; }
 
 size_t Buffer::ReadFd( int fd ) {
-  size_t len = read( fd, &_token, TOKEN_SIZE );
-  if( len < 0 ) {
-    // log 后面换
-    perror( "Buffer::ReadFd" );
-    exit(1);
-  } 
-  if( len > 0 ) HasWrite( {_token,len} ); // buff每次写len个字符
-  return len;
+    size_t len = read( fd, &_token, TOKEN_SIZE );
+    if( len < 0 ) {
+        // log 后面换
+        perror( "Buffer::ReadFd" );
+        exit(1);
+    } 
+    if( len > 0 ) HasWrite( {_token,len} ); // buff每次写len个字符
+    return len;
 }
 
 size_t Buffer::WriteFd( int fd ) {
-  vector<iovec> iovecs = _stream_buffer.as_iovecs();
-  size_t len = writev( fd, &iovecs[0], iovecs.size() );
-  if( len < 0 ) {
-    perror("Buffer::WriteFd");
-    exit(1);
-  }
-  PopOutput(len); // 已读len个字节 
-  return len;
+    vector<iovec> iovecs = _stream_buffer.as_iovecs();
+    size_t len = writev( fd, &iovecs[0], iovecs.size() );
+    if( len < 0 ) {
+        perror("Buffer::WriteFd");
+        exit(1);
+    }
+    PopOutput(len); // 已读len个字节 
+    return len;
 }

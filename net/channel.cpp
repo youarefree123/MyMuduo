@@ -17,6 +17,19 @@ Channel::Channel( EventLoop* loop, size_t fd )
     tied_ ( false )  {}
 // 原版全是判断Channel是否有回调执行和Channel是否属于当前loop的断言
 
+// 释放对应资源（就是一堆断言，啥也没做）
+// 一个Channel的声明周期到底有多长
+Channel::~Channel()
+{
+  assert(!eventHandling_);
+  assert(!addedToLoop_);
+  if (loop_->isInLoopThread())
+  {
+    assert(!loop_->hasChannel(this));
+  }
+}
+
+
 // Tie 上obj，保证资源不被释放？？这是观察者模型的应用
 void Channel::Tie( const std::shared_ptr< void >& obj ) {
     tie_ = obj;

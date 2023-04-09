@@ -17,7 +17,7 @@ class Channel : noncopyable
 {
 public:
     explicit Channel( EventLoop* loop, size_t fd );
-    ~Channel() = default;
+    ~Channel();
 
 
     // 事件回调

@@ -4,12 +4,16 @@
 #include <unistd.h>
 
 #include "log.h"
+#include "poller.h"
 #include "event_loop.h"
 
 namespace {
 
+// __thread 也就是thread_local 
+// 防止一个线程创建多个eventloop
 __thread EventLoop* t_loop_in_this_thread = nullptr;
 
+// 超时时间
 const int KPollTimeMs = 10000;
 
 // 创建wakeup_fd
@@ -60,12 +64,96 @@ EventLoop::EventLoop()
     p_wakeup_channel_( new Channel( this, wakeup_fd_ ) ),
     current_active_channel_( nullptr )
 {
-    DEBUG( "EventLoop created,tid:{}",thread_id );
+    DEBUG( "EventLoop created:{},tid:{}",reinterpret_cast<size_t>(this),thread_id );
     if( t_loop_in_this_thread ) {
-        CRITICAL( "Another EventLoop {} exists in this thread", t_loop_in_this_thread );
-        
+        CRITICAL( "Another EventLoop {} exists in this thread", reinterpret_cast<size_t>(t_loop_in_this_thread) );
     }
 
-
+    // 注册wakeup_fd的感兴趣事件以及相应的回调
+    p_wakeup_channel_->set_read_callback( std::bind( &EventLoop::HandleRead, this ) );
+    // 每个eventloop都会监听EventChannel的EPOLLIN事件
+    p_wakeup_channel_->EnableReading();
 }
 
+EventLoop::~EventLoop() {
+    // wakeup 清空事件，并从loop中移除
+    p_wakeup_channel_->DisableAll();  
+    p_wakeup_channel_->Remove();  
+    ::close( wakeup_fd_ );
+    t_loop_in_this_thread = nullptr;
+}
+
+/**
+ *  WakeUp 往wakeupfd中塞八个字节，用于结束poll的阻塞
+ *  （wakeup_fd 如何在所有loop中共享呢？？）
+ * */
+void EventLoop::WakeUp() {
+    size_t one = 1;
+    ssize_t n = ::write(wakeup_fd, &one, sizeof(one) );
+    if( n != sizeof(one) ) {
+        ERROR( "EventLoop::WakeUp()" );
+    }
+}
+
+/**
+ * wakeupfd在epoll上注册读事件，对应的回调就是HandleRead()函数
+ * */
+void EventLoop::HandleRead() {
+    size_t one = 1;
+    ssize_t n = ::read( wakeup_fd, &one, sizeof(one) );
+    if( n != sizeof(one) ) {
+        ERROR( "EventLoop::HandleRead()" );
+    }
+}
+
+/**
+ *  开启轮训：
+ *  1、Poll 阻塞等待事件发生
+ *  2、遍历所有发生事件的channel，并执行对应回调
+ *  3、执行Functor队列中的回调
+ * 
+ *  为什么要3:DoPendingFunctors() ? 
+ *  mainloop负责accept和唤醒subloop
+ *  唤醒方式就是利用eventfd，触发一个读事件，subloop就会从poll函数处唤醒，然后执行被manloop塞过来的回调，这些回调都在Functor队列中
+ **/
+void EventLoop::Loop() {
+    AssertInLoopThread();
+    looping_ = true;
+    quit_ = true;
+    TRACE( "EventLopp {} start looping!",reinterpret_cast<size_t>(this) );
+
+    while( !quit_ ) {
+        // 清空原来的活跃Channel, clear 让size = 1;
+        active_channels_.clear();
+        // 主loop会监听client的fd和wakeup的fd
+        // 那subloop呢？
+        poll_return_time_ = p_poller_->Poll( KPollTimeMs, &active_channels_ );
+
+        for(Channel* current_channel : active_channels_) {
+            // 处理对应事件
+            current_channel->HandleEvent( poll_return_time_ );
+        }
+        /**
+         *  主eventloop主要处理accept和wakeup，是在上面轮训中处理的，从eventloop Poll只会触发wakeup，然后从poll函数那唤醒，上面的轮训只会执行wakeupfd的读字节操作，真正处理回调是在下面的函数中 
+         **/
+        DoPendingFunctors();
+    }
+
+    looping_ = false;
+}
+/** 
+ 退出事件循环,可能在某个回调中调用？？
+    1、loop在自己的线程中调用，quit_变为true，然后退出loop
+    2、如果是本线程中调用其他subloop的Quit(),
+ **/
+void EventLoop::Quit() {
+    // quit_ 需要是原子的，否则可能会出现并发问题
+    // 例如，quit_ 为false的时候，执行到while(!quit_), 进入循环后，quit_ = true了，然后执行析构，最后再执行循环后的语句，出现访问无效对象的问题？？（为什么不在析构做断言？？） 
+    quit_  = true; 
+
+    // 如果不是本线程的loop，其loop的quit_改成true也不会立即生效，因为可能该loop还在Poll那卡着，所以需要唤醒一下该loop。
+    if( !IsInLoopThread() ) {
+        WakeUp();
+    }
+
+}

@@ -125,6 +125,7 @@ void EpollPoller::RemoveChannel( Channel* channel ) {
     channel->set_fd_status( KNew );  
 }
 
+// 像epollfd注册该channel的对应感兴趣事件
 void EpollPoller::Update( int operation, Channel* channel) {
     struct epoll_event event;
     bzero( &event, sizeof(event) );

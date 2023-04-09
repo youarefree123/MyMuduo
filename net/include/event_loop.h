@@ -30,11 +30,13 @@ public:
     Timestamp PollReturnTime const { 
         return poll_return_time_;
     }
-    // 立即执行一个回调
+    // 立即执行一个回调（在当前线程中）
     // 在其他线程中使用是安全的
     void RunInLoop( Functor cb );
+    // 将cb放入队列中，唤醒loop所在线程
+    void QueueInLoop( Functor cb );
 
-    // 内部使用
+    // 内部使用，用来唤醒loop所在的线程
     void WakeUp();
     void UpdateChannel( Channel* channel );
     void RemoveChannel( Channel* channel );
@@ -59,8 +61,10 @@ private:
     using ChannelList = std::vector<Channel*>;
 
     void AbortNotInLoopThread(); 
-    void HandleRead(); // waked up 
+    void HandleRead(); /* event_fd读取内容，唤醒睡眠的loop */ 
     void DoPendingFunctors(); 
+   
+
 
     bool looping_; /* atomic , 是否在循环*/ 
     std::atomic<bool> quit_;  /*是否已经终止循环*/

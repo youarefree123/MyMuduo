@@ -9,7 +9,7 @@ int main()
 {
   for(int i = 0; i < 10; i++) {
     auto time = Timestamp::Now();
-    cout<<time<<endl;
+    cout<<time.ToString()<<endl;
   }
   
   return 0;

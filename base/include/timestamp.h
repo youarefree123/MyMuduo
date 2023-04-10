@@ -25,6 +25,8 @@ public:
         this->microseconds_since_epoch_ = lhs.microseconds_since_epoch();
         return *this;
     }
+    // 用法 string str =  (string)time;
+    operator std::string() const { return ToString(); }
 
 private:
     size_t microseconds_since_epoch_; 
@@ -37,6 +39,7 @@ inline bool operator< (const Timestamp& lhs,const Timestamp& rhs ) {
 inline bool operator== (const Timestamp& lhs,const Timestamp& rhs ) {
     return lhs.microseconds_since_epoch() == rhs.microseconds_since_epoch();
 }
+
 
 inline std::ostream& operator<< (std::ostream& os, const Timestamp& lhs ) {
     os<<lhs.ToString();

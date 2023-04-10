@@ -1,12 +1,14 @@
 #include <algorithm>
 #include <signal.h>
-#include <sys/eventfd.h>
 #include <unistd.h>
+#include <functional>
+#include <sys/eventfd.h>
 
 #include "log.h"
 #include "poller.h"
+#include "channel.h"
 #include "event_loop.h"
-
+#include "current_thread.h"
 namespace {
 
 // __thread 也就是thread_local 
@@ -58,13 +60,13 @@ EventLoop::EventLoop()
     quit_( false ),
     event_handling_( false ),
     calling_pending_functors_( false ),
-    thread_id( CurrentThread::Tid() ),
+    thread_id_( CurrentThread::Tid() ),
     p_poller_( Poller::NewPoller( this ) ),
     wakeup_fd_( CreatEventFd() ),
     p_wakeup_channel_( new Channel( this, wakeup_fd_ ) ),
     current_active_channel_( nullptr )
 {
-    DEBUG( "EventLoop created:{},tid:{}",reinterpret_cast<size_t>(this),thread_id );
+    DEBUG( "EventLoop created:{},tid:{}",reinterpret_cast<size_t>(this),thread_id_ );
     if( t_loop_in_this_thread ) {
         CRITICAL( "Another EventLoop {} exists in this thread", reinterpret_cast<size_t>(t_loop_in_this_thread) );
     }
@@ -89,7 +91,7 @@ EventLoop::~EventLoop() {
  * */
 void EventLoop::WakeUp() {
     size_t one = 1;
-    ssize_t n = ::write(wakeup_fd, &one, sizeof(one) );
+    ssize_t n = ::write(wakeup_fd_, &one, sizeof(one) );
     if( n != sizeof(one) ) {
         ERROR( "EventLoop::WakeUp()" );
     }
@@ -100,7 +102,7 @@ void EventLoop::WakeUp() {
  * */
 void EventLoop::HandleRead() {
     size_t one = 1;
-    ssize_t n = ::read( wakeup_fd, &one, sizeof(one) );
+    ssize_t n = ::read( wakeup_fd_, &one, sizeof(one) );
     if( n != sizeof(one) ) {
         ERROR( "EventLoop::HandleRead()" );
     }
@@ -156,4 +158,56 @@ void EventLoop::Quit() {
         WakeUp();
     }
 
+}
+/*
+    只有该channel是我该loop的，并且该loop也是我当前线程的loop，才会去更新channel
+    实际最后会调用Poller的Update，EventLoop不关心channel如何更新
+*/
+
+
+void EventLoop::UpdateChannel( Channel* channel ) {
+    assert( channel->owner_loop() == this );
+    AssertInLoopThread();
+    p_poller_->UpdateChannel(channel);
+}
+
+void EventLoop::RemoveChannel( Channel* channel ) {
+    assert( channel->owner_loop() == this );
+    AssertInLoopThread();
+    // 这个断言是干啥的
+    if( event_handling_ ) {
+        assert( current_active_channel_ == channel || 
+                std::find( active_channels_.begin(), active_channels_.end(), channel ) == active_channels_.end() );
+    }
+    p_poller_->RemoveChannel( channel );
+}   
+
+/**
+ * 返回是否是本Loop的channel， 实际上还是调用Poller的HasChannel来判断
+*/
+bool EventLoop::HasChannel( Channel* channel ) {
+    assert( channel->owner_loop() == this );
+    AssertInLoopThread();
+    return p_poller_->HasChannel( channel );
+}
+
+void EventLoop::AbortNotInLoopThread() {
+    CRITICAL( "EventLoop::AbortNotInLoopThread EventLoop {} was created in threadId_ {}, current_id = {}",
+               reinterpret_cast<size_t>(this), thread_id_, CurrentThread::Tid() );
+}
+
+/**
+ * 执行本loop中回调队列里的所有任务
+*/
+void EventLoop::DoPendingFunctors() {
+    std::vector<Functor> functors;
+    calling_pending_functors_ = true;
+
+    // 
+    {
+        std::lock_guard<std::mutex> lock( mtx_ );
+        functors.swap( pending_functors_ );  
+    }
+
+    calling_pending_functors_ = false;
 }

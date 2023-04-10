@@ -1,6 +1,9 @@
+#include <sys/epoll.h>
+
+#include "event_loop.h"
 #include "channel.h"
 #include "log.h"
-#include <sys/epoll.h>
+
 
 
 const int Channel::kNoneEvent = 0;
@@ -21,11 +24,11 @@ Channel::Channel( EventLoop* loop, size_t fd )
 // 一个Channel的声明周期到底有多长
 Channel::~Channel()
 {
-  assert(!eventHandling_);
-  assert(!addedToLoop_);
-  if (loop_->isInLoopThread())
+//   assert(!event_handling_);
+//   assert(!addedToLoop_);
+  if (loop_->IsInLoopThread())
   {
-    assert(!loop_->hasChannel(this));
+    assert(!loop_->HasChannel(this));
   }
 }
 

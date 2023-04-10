@@ -72,7 +72,7 @@ void EpollPoller::UpdateChannel( Channel* channel ) {
             channel->fd(), channel->events(), channel->fd_status() );
     int fd = channel->fd();
     // 未监听fd，或者是已删除监听的fd
-    // 问题：如果我add一个空事件会怎么样？
+    // 问题：如果我KNew和KDeleted的Channel add一个空事件会怎么样？
     if( fd_status == KNew || fd_status == KDeleted ) {
         if( fd_status == KNew ) {
         assert( channels_.find( fd ) == channels_.end() );
@@ -106,6 +106,10 @@ void EpollPoller::UpdateChannel( Channel* channel ) {
 
 /**
  *  如果channel 此时监听空事件，就从ChannleMap中移除该channel
+ * 删除包含三件事
+ * 1、将该channel 从 channels_ 中移除
+ * 2、如果该channel还是Kadded状态,则还需要从epoll_fd的监听队列中移除
+ * 3、将该channel的状态设置成kNew
 */
 void EpollPoller::RemoveChannel( Channel* channel ) {
     int fd = channel->fd();

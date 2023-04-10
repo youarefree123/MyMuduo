@@ -27,16 +27,16 @@ public:
     void HandleEvent( Timestamp receive_time );
 
     // 设置回调函数对象
-    void set_read_callback( ReadEventCallback& cb ) {
+    void set_read_callback( ReadEventCallback cb ) {
         read_callback_ = std::move( cb );
     }
-    void set_write_callback( EventCallback& cb ) {
+    void set_write_callback( EventCallback cb ) {
         write_callback_ = std::move( cb );
     }
-    void set_close_callback( EventCallback& cb ) {
+    void set_close_callback( EventCallback cb ) {
         close_callback_ = std::move( cb );
     }
-    void set_error_callback( EventCallback& cb ) {
+    void set_error_callback( EventCallback cb ) {
         error_callback_ = std::move( cb );
     }
 
@@ -74,7 +74,7 @@ public:
     // 更新感兴趣事件
     void Update(); 
     void Remove();
-    // 限时完成一个任务？？
+    // recetive_time是poll返回后那个时间戳
     void HandleEventWithGuard( Timestamp recetive_time ); 
 
     string EventsToString(int ev);

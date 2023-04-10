@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <atomic>
 #include <mutex>
 #include <functional>
 
@@ -17,7 +18,7 @@ class EventLoop : noncopyable
 {
 
 public: 
-    using std::function<void()> Functor;
+    using Functor = std::function<void()>;
     EventLoop();
     ~EventLoop();
 
@@ -27,7 +28,7 @@ public:
     void Quit();
 
     // 轮询返回的时间，通常意味着有事件到达
-    Timestamp PollReturnTime const { 
+    Timestamp PollReturnTime() const { 
         return poll_return_time_;
     }
     // 立即执行一个回调（在当前线程中）
@@ -43,7 +44,7 @@ public:
     bool HasChannel( Channel* channel );
 
     bool IsInLoopThread() const {
-        return thread_id == CurrentThread::Tid();
+        return thread_id_ == CurrentThread::Tid();
     }
     // 断言，确认loop是否在对应线程里
     void AssertInLoopThread() {
@@ -70,7 +71,7 @@ private:
     std::atomic<bool> quit_;  /*是否已经终止循环*/
     bool event_handling_; /* atomic, 是否有事件正在处理 */
     bool calling_pending_functors_; /* atomic 是否正在调用回调？？ */
-    const pid_t thread_id; /* 当前loop的线程 */
+    const pid_t thread_id_; /* 当前loop的线程 */
     Timestamp poll_return_time_; /* 记录本次poll的返回时间 */
     std::unique_ptr<Poller> p_poller_; /*  */ 
     int wakeup_fd_; /* 重要，唤醒subloop 的fd*/

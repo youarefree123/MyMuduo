@@ -41,10 +41,12 @@ void Channel::Tie( const std::shared_ptr< void >& obj ) {
 // 更新fd的events, 借助loop来实现
 void Channel::Update() {
 // add code
+    loop_->UpdateChannel(this);
 } 
 // 在当前loop中删除该Channel
 void Channel::Remove() {
   // add code
+  loop_->RemoveChannel(this);
 }
 
 // 本质就是执行回调，但是为什么需要Tie和非Tie呢？

@@ -34,13 +34,71 @@ int main(int argc, char const *argv[])
     channel.EnableReading();
 
     struct itimerspec howlong;
+        
     bzero( &howlong, sizeof howlong );
-    howlong.it_interval.tv_sec = 5;
-    ::timerfd_settime( timerfd, 0, &howlong, NULL );
+    howlong.it_value.tv_sec = 5;
+    howlong.it_interval.tv_sec = 1;
+    // howlong.it_interval = {1, 0}; // period timeout value = 1s
+    // howlong.it_value = {5, 100};  // initial timeout value = 5s100ns
+
+    ::timerfd_settime( timerfd, TFD_TIMER_ABSTIME, &howlong, NULL );
+
+    // for (int i = 0; i < 5 ; ++i) {
+    //     uint64_t exp = 0;
+    //     uint64_t s = 0;    
+    //     s = read(timerfd, &exp, sizeof(uint64_t));
+    //     INFO( "read:{}, i = {}", exp, i );
+        
+    // }
+
 
     loop.Loop();
+    channel.DisableAll();
+    channel.Remove();
 
     ::close( timerfd );
   
   return 0;
 }
+
+
+// #include <iostream>
+// #include <sys/timerfd.h>
+// #include <poll.h>
+// #include <unistd.h>
+// #include <assert.h>
+
+// using namespace std;
+
+// int main() {
+//     struct itimerspec timebuf;
+//     int timerfd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
+//     timebuf.it_interval = {1, 0}; // period timeout value = 1s
+//     timebuf.it_value = {5, 100};  // initial timeout value = 5s100ns
+//     timerfd_settime(timerfd, 0, &timebuf, NULL);
+
+//     struct pollfd fds[1];
+//     int len = sizeof(fds) / sizeof(fds[0]);
+//     fds[0].fd = timerfd;
+//     fds[0].events = POLLIN | POLLERR | POLLHUP;
+
+//     while (true)
+//     {
+//         int n = poll(fds, len, -1);
+//         for (int i = 0; i < len && n-- > 0; ++i) {
+//             if (fds[i].revents & POLLIN)
+//             {
+//                 uint64_t val;
+//                 int ret = read(timerfd, &val, sizeof(val));
+//                 if (ret != sizeof(val)) // ret should be 8
+//                 {
+//                     cerr << "read " << ret << "bytes instead of 8 frome timerfd" << endl;
+//                     break;
+//                 }
+//                 cout << "timerfd = " << timerfd << " timeout!" << endl;
+//             }
+//         }
+//     }
+//     close(timerfd);
+//     return 0;
+// }

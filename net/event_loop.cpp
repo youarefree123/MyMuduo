@@ -121,7 +121,7 @@ void EventLoop::HandleRead() {
 void EventLoop::Loop() {
     AssertInLoopThread();
     looping_ = true;
-    quit_ = true;
+    quit_ = false;
     TRACE( "EventLopp {} start looping!",reinterpret_cast<size_t>(this) );
 
     while( !quit_ ) {

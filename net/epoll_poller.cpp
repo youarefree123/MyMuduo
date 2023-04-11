@@ -68,7 +68,7 @@ Timestamp EpollPoller::Poll( int timeout_ms, ChannelList* active_channels ) {
 */
 void EpollPoller::UpdateChannel( Channel* channel ) {
     const int fd_status = channel->fd_status();
-    TRACE( "fd = {}, events = {}, fd_status = {}", \
+    TRACE( "Before UpdateChannel : fd = {}, events = {}, fd_status = {}", \
             channel->fd(), channel->events(), channel->fd_status() );
     int fd = channel->fd();
     // 未监听fd，或者是已删除监听的fd
@@ -102,6 +102,8 @@ void EpollPoller::UpdateChannel( Channel* channel ) {
 
     }
 
+    TRACE( "After UpdateChannel : fd = {}, events = {}, fd_status = {}", \
+            channel->fd(), channel->events(), channel->fd_status() );
 } 
 
 /**
@@ -113,20 +115,24 @@ void EpollPoller::UpdateChannel( Channel* channel ) {
 */
 void EpollPoller::RemoveChannel( Channel* channel ) {
     int fd = channel->fd();
-    TRACE( "fd = {}", fd );
     assert(channels_.find(fd) != channels_.end());
     assert(channels_[fd] == channel);
     assert(channel->IsNoneEvent());
 
     int fd_status = channel->fd_status();
+    TRACE( "Before RemoveChannel fd = {}, events = {}, fd_status = {}", \
+            channel->fd(), channel->events(), channel->fd_status() );
     assert( fd_status == KAdded || fd_status == KDeleted );
     size_t num = channels_.erase( fd ); 
     assert( num == 1 );
 
+    
     if( fd_status == KAdded ) {
         Update( EPOLL_CTL_DEL, channel );
     }
     channel->set_fd_status( KNew );  
+    TRACE( "After RemoveChannel fd = {}, events = {}, fd_status = {}", \
+            channel->fd(), channel->events(), channel->fd_status() );
 }
 
 // 像epollfd注册该channel的对应感兴趣事件

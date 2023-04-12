@@ -5,7 +5,7 @@
 #include <semaphore.h>
 
 #include "current_thread.h"
-#include "threadwrapper.h"
+#include "thread_wrapper.h"
 
 
 
@@ -33,6 +33,10 @@ ThreadWrapper::~ThreadWrapper() {
 /**
  *  通过二值信号量来保证新的thread已经获取tid后，再继续流程
  *  （牢记该类是记录新线程的所有信息，所以必须要获取到tid才能继续执行）
+ * 
+ * 为什么这里需要信号量来保证执行顺序？
+ * 在用一个函数或者函数对象（包括lambda）构造std::thread时，一个线程便启动了。
+ * 线程的执行顺序是不可预测的，所以需要信号量来同步执行顺序
 */
 void ThreadWrapper::Start() {
     assert( !started_ );

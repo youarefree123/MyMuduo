@@ -12,6 +12,7 @@ add_test_exec (test_btye_stream)
 add_test_exec (test_buffer_fd_write)
 add_test_exec (test_log)
 add_test_exec (test_timestamp)
+add_test_exec (test_thread)
 
 
 

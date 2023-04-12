@@ -10,7 +10,7 @@ int main()
   Buffer b{};
   
 
-  ONLY_TO_FILE; LOGINIT(); LOG_LEVEL_INFO;
+  ONLY_TO_CONSOLE; LOGINIT(); LOG_LEVEL_INFO;
   for( int i = 0; i < 10; i++ ) {
     if( i < 5 ) {
       LOG_LEVEL_INFO;

@@ -10,6 +10,7 @@ endmacro (add_test_exec)
 
 add_test_exec (test_inet_address)
 add_test_exec (test_channel)
+# add_test_exec (test_wakeup_fd)
 
 
 

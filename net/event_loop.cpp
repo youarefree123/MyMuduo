@@ -87,7 +87,7 @@ EventLoop::~EventLoop() {
 
 /**
  *  WakeUp 往wakeupfd中塞八个字节，用于结束poll的阻塞
- *  （wakeup_fd 如何在所有loop中共享呢？？）
+ *  一个loop都有对应的自己的wakeupfd， WakeUp这个函数是给其他loop调用的，用于唤醒本loop
  * */
 void EventLoop::WakeUp() {
     size_t one = 1;
@@ -203,11 +203,46 @@ void EventLoop::DoPendingFunctors() {
     std::vector<Functor> functors;
     calling_pending_functors_ = true;
 
-    // 
+    // 利用局部变量，交换两个容器
+    // 减少临界区长度（减少mainloop塞回调的时延）、避免死锁（functor可能会再调用QueueInLoop,会有同一线程加两次锁的问题）
     {
         std::lock_guard<std::mutex> lock( mtx_ );
         functors.swap( pending_functors_ );  
     }
 
+    for(auto& functor: functors) {
+        functor();
+    }
+
     calling_pending_functors_ = false;
+}
+
+/**
+ *   在该loop中执行cb
+ *   如果是非本loop线程 调用的其他线程loop的该函数，不能立即执行，需要将cb放入队列
+ *   然后唤醒对应的worker线程来在该loop中执行
+ *  （为了避免线程安全问题，每个线程和loop是一一绑定的） 
+ * */
+void EventLoop::RunInLoop( Functor cb ) {
+    if( IsInLoopThread() ) {
+        cb();
+    }
+    else {
+        QueueInLoop( std::move( cb ) );
+    }
+}
+
+void EventLoop::QueueInLoop( Functor cb ) {
+    // 因为可能有不只一个其他loop在同一时间往该loop队列里append回调，所以该队列是临界区
+    {
+        std::lock_guard<std::mutex> lock( mtx_ );
+        pending_functors_.push_back( std::move( cb ) );
+    }
+
+    // 如果是非本线程访问该loop，或是在本线程，目前正在执行 pending_functors_ 中的回调
+    // 换句话说，只有在loop函数（134行），执行本active_channels_中的cb时，不触发wakeup
+    // （因为此时还没有执行DoPendingFunctors，容器还没有交换，此时append进去的回调在本轮就会直接执行）
+    if( !IsInLoopThread() || calling_pending_functors_ ) {
+        WakeUp();
+    }
 }

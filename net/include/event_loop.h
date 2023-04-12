@@ -14,6 +14,13 @@
 class Channel;
 class Poller;
 
+
+/**
+ *  muduo 没有使用常见的生产者-消费者的线程安全队列来作为mainloop和subloop的通信方式
+ *  而是使用eventfd，mainloop通过轮询的方式分发fd（channel）给subloop
+*/
+
+
 class EventLoop : noncopyable
 {
 
@@ -34,7 +41,7 @@ public:
     // 立即执行一个回调（在当前线程中）
     // 在其他线程中使用是安全的
     void RunInLoop( Functor cb );
-    // 将cb放入队列中，唤醒loop所在线程
+    // 把上层注册的回调函数放入队列，并唤醒loop所在线程来执行
     void QueueInLoop( Functor cb );
 
     // 内部使用，用来唤醒loop所在的线程
@@ -72,7 +79,7 @@ private:
     bool event_handling_; /* atomic, 是否有事件正在处理 */
     bool calling_pending_functors_; /* atomic 是否正在调用回调？？ */
     const pid_t thread_id_; /* 当前loop的线程 */
-    Timestamp poll_return_time_; /* 记录本次poll的返回时间 */
+    Timestamp poll_return_time_; /* 记录本次poll的返回时间点 */
     std::unique_ptr<Poller> p_poller_; /*  */ 
     int wakeup_fd_; /* 重要，唤醒subloop 的fd*/
     std::unique_ptr<Channel> p_wakeup_channel_;  

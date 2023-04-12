@@ -89,7 +89,7 @@ void EpollPoller::UpdateChannel( Channel* channel ) {
     // 正常更新，可能会有删除操作
     else {
         assert( channels_.find( fd ) != channels_.end() );
-        assert ( channels_[fd] = channel );
+        assert( channels_[fd] = channel );
         assert( fd_status == KAdded );
 
         if( channel->IsNoneEvent() ) {

@@ -6,6 +6,7 @@
 
 #include "current_thread.h"
 #include "thread_wrapper.h"
+#include "log.h"
 
 
 
@@ -26,6 +27,7 @@ ThreadWrapper::ThreadWrapper( ThreadFunc func, const std::string& name )
 // 线程已经开启，并且没有Join的话，默认会detach
 ThreadWrapper::~ThreadWrapper() {
     if( started_ && !joined_ ) {
+        TRACE( "tid:{} detached.", tid_ );
         p_thread_->detach();
     }
 }
@@ -53,15 +55,17 @@ void ThreadWrapper::Start() {
             func_();
         }   
      ) );
-
+    
     ::sem_wait(&sem); /*必须等待互殴去上面新线程的tid*/
     assert( tid_ > 0 );
+    
 } 
 
 void ThreadWrapper::Join() {
     assert( started_ ); 
     assert( !joined_ );
     joined_ = true;
+    TRACE( "tid:{} start ThreadWrapper::Join()", tid_ );
     p_thread_->join();
 }
 

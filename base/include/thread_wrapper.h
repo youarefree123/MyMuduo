@@ -1,3 +1,5 @@
+#pragma once 
+
 #include <thread>
 #include <functional>
 #include <memory>

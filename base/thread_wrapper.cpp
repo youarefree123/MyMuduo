@@ -46,7 +46,8 @@ void ThreadWrapper::Start() {
     sem_t sem;
     ::sem_init( &sem, false, 0 );
     
-    // 移动语义实现智能指针赋值 
+    // 移动语义实现智能指针赋值
+    // 为了控制新线程执行时间，只有被调用Start()后才会真正创建新线程 
     p_thread_ = std::move( std::make_unique<std::thread>( 
         [&](){
             tid_ = CurrentThread::Tid(); 

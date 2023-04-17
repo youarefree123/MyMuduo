@@ -69,6 +69,9 @@ EventLoop::EventLoop()
     DEBUG( "EventLoop created:{},tid:{}",reinterpret_cast<size_t>(this),thread_id_ );
     if( t_loop_in_this_thread ) {
         CRITICAL( "Another EventLoop {} exists in this thread", reinterpret_cast<size_t>(t_loop_in_this_thread) );
+    } 
+    else {
+        t_loop_in_this_thread = this;
     }
 
     // 注册wakeup_fd的感兴趣事件以及相应的回调
@@ -79,6 +82,7 @@ EventLoop::EventLoop()
 
 EventLoop::~EventLoop() {
     // wakeup 清空事件，并从loop中移除
+    DEBUG( "EventLoop::~EventLoop(),eventloop:{},tid:{}",reinterpret_cast<size_t>(this),thread_id_ );
     p_wakeup_channel_->DisableAll();  
     p_wakeup_channel_->Remove();  
     ::close( wakeup_fd_ );
@@ -225,6 +229,8 @@ void EventLoop::DoPendingFunctors() {
  * */
 void EventLoop::RunInLoop( Functor cb ) {
     if( IsInLoopThread() ) {
+        DEBUG( "EventLoop {} , threadId_ {}, current_id = {}",
+               reinterpret_cast<size_t>(this), thread_id_, CurrentThread::Tid() );
         cb();
     }
     else {

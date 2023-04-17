@@ -40,24 +40,24 @@ EventLoop* EventLoopThread::StartLoop() {
     EventLoop* loop = nullptr;
     {
         std::unique_lock<std::mutex> lock(mtx_);
-        // 使用while防止虚假唤醒
+        // 使用while防止虚假唤醒,Start()以后可能还没分配到一个loop，所以需要wait来同步
         while( loop_ == nullptr ) {
             cond_.wait( lock );
         }
         // // 或者使用lambda, 条件满足就一直wait
         // cond_.wait( lock, [](){ return loop_ != nullptr; } )
-        loop = loop_;
+        loop = loop_; // 这个是新版新加的，以前是直接返回loop_;(为什么要这么处理)
     }
     return loop;
 }
 
 
  /**
-  * 每个thread执行的func
+  * 线程主函数在栈上定义一个EventLoop对象,在这里绑定唯一的loop
  */
 void EventLoopThread::thread_func() {
-    EventLoop loop{};
-    // 如果设置了对loop做初始化，就去做一下
+    EventLoop loop{}; /*eventloop 都是栈上对象，不需要手动释放*/
+    // 如果设置了对loop一些操作，就去做一下
     if( cb_ ) {
         cb_( &loop );
     }
@@ -66,7 +66,7 @@ void EventLoopThread::thread_func() {
     {
         std::lock_guard<std::mutex> lock( mtx_ );
         loop_ = &loop;
-        cond_.notify_one();
+        cond_.notify_one(); // 在临界区内唤醒，以免唤醒丢失问题
     }
 
     loop.Loop(); /*开启loop*/

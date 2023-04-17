@@ -2,6 +2,8 @@
 # 指定可执行文件名及源码
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../tests")
 
+
+
 # 宏定义 add_test_exec
 macro (add_test_exec exec_name)
     add_executable ("${exec_name}" "${exec_name}.cpp")
@@ -10,7 +12,7 @@ endmacro (add_test_exec)
 
 add_test_exec (test_inet_address)
 add_test_exec (test_channel)
-# add_test_exec (test_wakeup_fd)
+add_test_exec (test_eventloop_thread)
 
 
 

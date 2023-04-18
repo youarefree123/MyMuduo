@@ -20,7 +20,7 @@ class EventLoopThreadPool : noncopyable
 public:
     using ThreadInitCallback = std::function<void(EventLoop*)>;
     EventLoopThreadPool( EventLoop* base_loop, const std::string& name_arg ); 
-    ~EventLoopThreadPool() = default; /*pool析构不需要释放vector中的指针对应内存，所有loop都是栈上开辟*/
+    ~EventLoopThreadPool(); /* .h中仅声明，因为EventLoopThread在本文件内只做了前向声明  */
 
     void set_thread_num( int nums ) { num_threads_ = nums; }
     bool started() const { return started_; }

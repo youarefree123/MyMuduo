@@ -1,7 +1,8 @@
 #include <string>
 #include <cassert>
 
-#include "eventloop.h"
+#include "event_loop.h"
+#include "eventloop_thread.h"
 #include "eventloop_thread_pool.h"
 
 
@@ -14,6 +15,8 @@ EventLoopThreadPool::EventLoopThreadPool( EventLoop* base_loop, const std::strin
 {
 }    
 
+/*pool析构不需要释放vector中的指针对应内存，所有loop都是栈上开辟*/
+EventLoopThreadPool::~EventLoopThreadPool() {} 
 
 void EventLoopThreadPool::Start( const ThreadInitCallback& cb ) {
     assert( !started() );
@@ -25,7 +28,7 @@ void EventLoopThreadPool::Start( const ThreadInitCallback& cb ) {
     for( int i = 0; i < num_threads_; ++i ) {
         char buf[ name_.size() + 32 ] = {0};
         // 设置新name, append一下编号
-        snprintf(buf, sizeof buf, "%s%d", name.c_str(), i);
+        snprintf(buf, sizeof buf, "%s%d", name_.c_str(), i);
         
         EventLoopThread* t = new EventLoopThread( cb, buf );
         threads_.push_back( std::unique_ptr<EventLoopThread>( t ) );

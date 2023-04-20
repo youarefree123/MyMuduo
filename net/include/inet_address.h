@@ -7,15 +7,17 @@ using std::string;
 class InetAddress {
 public:
     explicit InetAddress( uint16_t port = 80, string ip = "127.0.0.1" );
-    explicit InetAddress( const InetAddress& addr ) 
-        : sockaddr_(addr.sockaddr()){} 
-    
+    explicit InetAddress( const sockaddr_in& addr ) 
+        : sockaddr_(addr){} 
+    static const sockaddr* sockaddr_cast(const struct sockaddr_in* addr);
+
     string ToIp() const;
     uint16_t ToPort() const;
     string ToIpPort() const;
 
-    const sockaddr_in& sockaddr() const { return sockaddr_; } 
-
+    const sockaddr_in* get_sockaddr() const { return &sockaddr_ ; } /*  {}前必须加const修饰 */
+    void set_sockaddr( const sockaddr_in& addr ) { sockaddr_ = addr; }
 private:
     sockaddr_in sockaddr_;
+    
 };

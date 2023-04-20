@@ -25,3 +25,7 @@ uint16_t InetAddress::ToPort() const {
 string InetAddress::ToIpPort() const {
       return ToIp() + " :" + std::to_string( ToPort() );
 }
+
+const struct sockaddr* InetAddress::sockaddr_cast(const struct sockaddr_in* addr) {
+    return static_cast<const struct sockaddr*>(static_cast<const void*>(addr));
+}

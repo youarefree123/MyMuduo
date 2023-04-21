@@ -1,4 +1,4 @@
-#include "buffer.h"
+#include "unlimited_buffer.h"
 #include <iostream>
 #include <sys/types.h>
 #include <unistd.h>
@@ -9,7 +9,7 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-  Buffer bs{};
+  UnlimitedBuffer bs{};
   int rfd = open("../tests/data", O_RDONLY);
   int wfd = open("../tests/dtmp", O_WRONLY|O_CREAT|O_TRUNC, 0644);
   assert(rfd > 0);

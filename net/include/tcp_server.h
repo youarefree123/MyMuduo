@@ -11,8 +11,9 @@
 #include "noncopyable.h"
 #include "eventloop_thread_pool.h"
 
-/* 给用户使用的类，所以不用前置声明，直接导入头文件，后续用户使用的时候就不需要再导相应的包了 */
-
+/*  给用户使用的类，所以不用前置声明，直接导入头文件，后续用户使用的时候就不需要再导相应的包了 
+    核心类，管理Acceptor和所有conn
+*/
 class TcpServer
 {
 public:

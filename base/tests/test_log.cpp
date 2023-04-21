@@ -1,4 +1,4 @@
-#include "buffer.h"
+
 #include "noncopyable.h"
 #include "log.h"
 
@@ -7,7 +7,6 @@ using namespace std;
 int main()
 {
   // srcDir_ = getcwd(nullptr, 256);
-  Buffer b{};
   
 
   ONLY_TO_CONSOLE; LOGINIT(); LOG_LEVEL_INFO;

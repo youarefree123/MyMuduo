@@ -1,13 +1,14 @@
 #pragma once
 
 #include "storage_block.h"
-#define TOKEN_SIZE 4048
+// #define TOKEN_SIZE 4048
+
+
 
 // 无限制字符流
-class Buffer {
+class UnlimitedBuffer {
 private:
     BlockList _stream_buffer{};
-    char _token[TOKEN_SIZE] ;
     size_t _size;
     size_t _nwritten;
     size_t _nread;
@@ -15,7 +16,7 @@ private:
     bool _error{};  //!< Flag indicating that the stream suffered an error.
 
 public:
-    Buffer();
+    UnlimitedBuffer();
     size_t HasWrite(const std::string &data);
     // size_t remaining_capacity() const;
     // 设置写结束

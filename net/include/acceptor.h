@@ -11,7 +11,7 @@ class EventLoop;
 class InetAddress;
 
 /**
- * 仅与主loop配合调用，接收到来的TCP连接，并分发到subloop
+ * 仅与主loop配合调用，监听并接收到来的TCP连接
 */
 
 class Acceptor 

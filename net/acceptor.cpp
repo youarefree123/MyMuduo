@@ -30,11 +30,11 @@ Acceptor::Acceptor( EventLoop* loop, const InetAddress& listen_addr, bool reuse_
     listen_socket_.set_reuse_port( reuse_port );
     listen_socket_.BindAddress( listen_addr );
 
-    // 监听fd注册读事件
+    // listenfd注册读事件
     listen_channel_.set_read_callback( std::bind( &Acceptor::HandleRead, this ) );
 }
 
-// accept 都没了，程序也没必要执行下去了吧
+// Acceptor 都没了，程序也没必要执行下去了吧
 Acceptor::~Acceptor() {
     listen_channel_.DisableAll();
     listen_channel_.Remove();

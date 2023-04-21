@@ -15,7 +15,8 @@ public:
     uint16_t ToPort() const;
     string ToIpPort() const;
 
-    const sockaddr_in* get_sockaddr() const { return &sockaddr_ ; } /*  {}前必须加const修饰 */
+    /***************这里const去掉会有一个经典错误*****************/
+    const sockaddr_in* get_sockaddr() const { return &sockaddr_ ; } /*{}前必须加const修饰 */
     void set_sockaddr( const sockaddr_in& addr ) { sockaddr_ = addr; }
 private:
     sockaddr_in sockaddr_;

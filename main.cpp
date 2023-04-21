@@ -1,4 +1,6 @@
 #include "log.h"
+#include "acceptor.h"
+#include "tcp_server.h"
 using namespace std;
 
 int main(int argc, char const *argv[])

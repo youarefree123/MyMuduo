@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.20)
 
 set( PROJECT_NAME "webserver" )
 set(CMAKE_CXX_STANDARD 17)
+# 设置优化等, 还有 -fPIC 的问题
+# set( CXX_FLAG... )
 
 project(${PROJECT_NAME})
 
@@ -41,6 +43,7 @@ target_include_directories (
 
 
 # 指定链接库
+# 没有写包未找到的逻辑
 target_link_libraries(
   ${PROJECT_NAME} PUBLIC 
   net 

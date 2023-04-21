@@ -67,7 +67,6 @@ void Acceptor::HandleRead() {
         }
     }
     else {
-        
         // 对接收到的fd做初始化操作，如果没有注册过，则直接关闭
         // new_conn_cb_ 何时注册的？
         if( new_conn_cb_ ) {
@@ -77,7 +76,6 @@ void Acceptor::HandleRead() {
         else {
             ::close( connfd );
         }
-
 
     }
 }

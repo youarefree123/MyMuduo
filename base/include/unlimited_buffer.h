@@ -17,7 +17,8 @@ private:
 
 public:
     UnlimitedBuffer();
-    size_t HasWrite(const std::string &data);
+    size_t HasWrite(std::string&& data);
+    std::string HasRead(const size_t len);
     // size_t remaining_capacity() const;
     // 设置写结束
     void EndInput();
@@ -27,11 +28,7 @@ public:
     std::string PeekOutput(const size_t len) const;
     void PopOutput(const size_t len);
 
-    std::string HasRead(const size_t len) {
-        const auto ret = PeekOutput(len);
-        PopOutput(len);
-        return ret;
-    }
+    
 
     // 判断时候还能读
     bool InputEnded() const;
@@ -44,6 +41,6 @@ public:
     // 已读数
     size_t BytesRead() const;
 
-    size_t ReadFd( int fd ) ;
+    size_t ReadFd( int fd) ;
     size_t WriteFd( int fd ) ;
 };

@@ -1,20 +1,33 @@
-#include "unlimited_buffer.h"
 #include <unistd.h>
 #include <stdexcept>
-#define TOKEN_SIZE 4048
-using namespace std;
 
+#include "log.h"
+#include "unlimited_buffer.h"
+
+#define TOKEN_SIZE 65536
+
+using namespace std;
 
 UnlimitedBuffer::UnlimitedBuffer()
     : _size(0), _nwritten(0), _nread(0), _input_ended(0) {}
 
-size_t UnlimitedBuffer::HasWrite(const string &data) {
+size_t UnlimitedBuffer::HasWrite(string&& data) {
     size_t len = data.size();
-    _stream_buffer.Append(BlockList(std::move( const_cast<string&>(data) )));
+    // _stream_buffer.Append(BlockList(std::move( const_cast<string&>(data) )));
+    _stream_buffer.Append(BlockList(std::forward<string>( data )));
     _size += len;
     _nwritten += len;
     return len;
 }
+std::string UnlimitedBuffer::HasRead(const size_t len) {
+    const auto ret = PeekOutput(len);
+    PopOutput(len);
+    return ret;
+}
+
+
+
+
 
 string UnlimitedBuffer::PeekOutput(const size_t len) const { return _stream_buffer.Concatenate(min(len, _size)); }
 
@@ -40,12 +53,14 @@ size_t UnlimitedBuffer::BytesWritten() const { return _nwritten; }
 
 size_t UnlimitedBuffer::BytesRead() const { return _nread; }
 
+/* 从fd读取数据，Poller默认工作在LT模式下 */
 size_t UnlimitedBuffer::ReadFd( int fd ) {
-    char _token[TOKEN_SIZE] ; 
+    char _token[TOKEN_SIZE]; 
+    // 最多每次读TOKEN_SIZE大小的数据
     size_t len = read( fd, &_token, TOKEN_SIZE );
     if( len < 0 ) {
         // log 后面换
-        perror( "Buffer::ReadFd" );
+        CRITICAL( "Buffer::ReadFd" );
         exit(1);
     } 
     if( len > 0 ) HasWrite( {_token,len} ); // buff每次写len个字符

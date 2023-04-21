@@ -55,7 +55,7 @@ private:
 public:
     BlockList() = default;
 
-    BlockList(Block block) : _blocks{block} {}
+    BlockList(const Block& block) : _blocks{block} {}
 
     // BlockList 可以由block 构造出来
     // 所以下面的Append参数列表只需要有BlockList

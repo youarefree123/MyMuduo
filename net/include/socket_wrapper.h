@@ -35,7 +35,7 @@ public:
     void set_tcp_nodelay( bool on ); /*设置是否关闭Nagle算法 TCP_NODELAY */
     void set_reuse_addr( bool on ); /* 重用地址 SO_REUSEADDR */
     void set_reuse_port( bool on ); /* 重用端口 SO_REUSEPORT */
-    void set_keep_live( bool on ); /* 是否开启长连接 SO_KEEPALIVE */
+    void set_keep_alive( bool on ); /* 是否开启长连接 SO_KEEPALIVE */
 
 private:
     int sockfd_;

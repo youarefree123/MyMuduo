@@ -8,6 +8,7 @@
 #include "unlimited_buffer.h"
 #include "inet_address.h"
 #include "noncopyable.h"
+#include "timestamp.h"
 
 class Channel;
 class EventLoop;
@@ -26,7 +27,18 @@ class SocketWrapper;
  * 
  *  Acceptor 和 TcpConnection的区别: Acceptor负责处理新连接，TcpConnection负责处理后续
  * 
+ *
+ *  关于为什么要继承enable_shared_from_this，且绑定回调的时候为什么不用this
+ *  
+ *  1.把当前类对象作为参数传给其他函数时，为什么要传递share_ptr呢？直接传递this指针不可以吗？
+
+　　一个裸指针传递给调用者，谁也不知道调用者会干什么？假如调用者delete了该对象，而share_tr此时还指向该对象。
+
+　　2.这样传递share_ptr可以吗？share_ptr <this>
+
+　　这样会造成2个非共享的share_ptr指向一个对象，最后造成2次析构该对象。
  * 
+ *  
 */
 
 class TcpConnection : noncopyable,
@@ -40,6 +52,7 @@ public:
 
     explicit TcpConnection( EventLoop* loop,
                             const std::string name,
+                            int sockfd,
                             const InetAddress& local_addr,
                             const InetAddress& peer_addr );
     ~TcpConnection();
@@ -54,7 +67,9 @@ public:
     // void send(string&& message); // C++11
     // void send(Buffer&& message); // C++11
     void Send( const void* message, int len ); /* C++11是不是可以优化？ */
+    
     void Shutdown(); /* 线程不安全 */
+    void ShutdownInLoop(); 
 
     // 设置回调
     void set_conn_cb( const ConnectionCallback& cb ) {
@@ -98,7 +113,16 @@ private:
         kConnected, /* 已连接 */
         kDisconnecting /* 正在断开 */
     };
+
+    void set_state( StateE s ) { state_ = s; }
+
+    // 每个连接对应的回调处理函数
+    void HandleRead( Timestamp receive_time );
+    void HandleWrite();
+    void HandleClose();
+    void HandleError();
     
+
     
     EventLoop* loop_; /* conn对象都是在subloop中管理的，所以这里一定不是mainloop */
     const std::string name_;

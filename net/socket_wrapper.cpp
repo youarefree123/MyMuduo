@@ -84,7 +84,7 @@ int SocketWrapper::Accept(InetAddress* peeraddr) {
     }
 
     /* 是否开启长连接 SO_KEEPALIVE */
-    void SocketWrapper::set_keep_live( bool on ) {
+    void SocketWrapper::set_keep_alive( bool on ) {
         int optval = on ? 1 : 0;
         ::setsockopt(sockfd_, SOL_SOCKET, SO_KEEPALIVE,
                     &optval, static_cast<socklen_t>(sizeof optval));

@@ -20,27 +20,30 @@ public:
     size_t HasWrite(std::string&& data);
     std::string HasRead(const size_t len);
     // size_t remaining_capacity() const;
-    // 设置写结束
-    void EndInput();
+    
+  
     void set_error() { _error = true; }
   
+    
+    // 去除前len个或者所有的数据
+    void PopOutput(const size_t len);
+    // 为了兼容muduo
+    void Retrieve( const size_t len ) { PopOutput(len); }
+    
     // 取前len个字符
     std::string PeekOutput(const size_t len) const;
-    void PopOutput(const size_t len);
+
+    void EndInput() { _input_ended = true; }  // 设置写结束
+    bool error() const { return _error; }
+    size_t size() const { return _size; }
+    bool BufferEmpty() const { return _size == 0; }
+    bool eof() const { return InputEnded() && BufferEmpty(); }
+    bool InputEnded() const { return _input_ended; } /* 判断是否还能读 */
 
     
+    size_t BytesWritten() const { return _nwritten; } /* 已写数  */
+    size_t ReadableBytes() const { return _nread; } /*  已读数 */
 
-    // 判断时候还能读
-    bool InputEnded() const;
-    bool error() const { return _error; }
-    size_t size() const;
-    bool BufferEmpty() const;
-    bool eof() const;
-    // 已写数
-    size_t BytesWritten() const;
-    // 已读数
-    size_t BytesRead() const;
-
-    size_t ReadFd( int fd) ;
-    size_t WriteFd( int fd ) ;
+    ssize_t ReadFd( int fd) ;
+    ssize_t WriteFd( int fd ) ;
 };

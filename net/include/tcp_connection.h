@@ -64,10 +64,11 @@ public:
     bool Connected() const { return state_ == kConnected; }
     bool Disconnected() const { return state_ == kDisconnected; }
 
-    void send(string&& message); // C++11
-    // void send(UnlimitedBuffer&& message); // C++11
+    void Send( const string&  buf); // C++11
+    // void Send(UnlimitedBuffer&& message); // C++11
     // void Send( const void* message, int len ); /* C++11是不是可以优化？ */
-    
+
+
     void Shutdown(); /* 线程不安全 */
     void ShutdownInLoop(); 
 
@@ -122,7 +123,7 @@ private:
     void HandleClose();
     void HandleError();
     
-
+    void SendInLoop(const void* message, size_t len);
     
     EventLoop* loop_; /* conn对象都是在subloop中管理的，所以这里一定不是mainloop */
     const std::string name_;

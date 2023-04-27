@@ -18,6 +18,11 @@ private:
 public:
     UnlimitedBuffer();
     size_t HasWrite(std::string&& data);
+
+    // 为了适配muduo
+    void Append(const char *data, size_t len);
+
+
     std::string HasRead(const size_t len);
     // size_t remaining_capacity() const;
     

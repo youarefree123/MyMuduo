@@ -19,6 +19,17 @@ size_t UnlimitedBuffer::HasWrite(string&& data) {
     _nwritten += len;
     return len;
 }
+
+
+ // 为了适配muduo
+void UnlimitedBuffer::Append(const char *data, size_t len)
+{
+    size_t nwrote = HasWrite( std::string( data,len ) );
+    if( nwrote != len ) {
+        CRITICAL( "UnlimitedBuffer::append" );
+    }
+}
+
 std::string UnlimitedBuffer::HasRead(const size_t len) {
     const auto ret = PeekOutput(len);
     PopOutput(len);

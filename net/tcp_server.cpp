@@ -47,7 +47,10 @@ TcpServer::~TcpServer() {
     /* 销毁每个连接 */
     for( auto& it : conns_ ) {
         TcpConnectionPtr p_conn(it.second); 
-        it.second.reset(); // v引用计数-1, v 是 shared_ptr
+        // it.second.reset() 后， tcpserver 本身的那个强智能指针就无法访问对应资源了
+        //  而局部智能智能对象 p_conn 作用域外又能直接析构掉
+        // 如果直接p_conn.reset(), 就无法调用下面的那个回调了
+        it.second.reset(); 
         p_conn->loop()->RunInLoop(
             std::bind( &TcpConnection::ConnectDestroyed, p_conn )
         ); 
@@ -75,13 +78,69 @@ void TcpServer::Start() {
     
 }
 
-   
-
-
 
 /// Not thread safe, but in loop
-void TcpServer::NewConnection(int sockfd, const InetAddress& peerAddr){}
+/**
+ * 每当有一个新的Conn连接，Acceptor就会执行一次该回调，来绑定这个连接的fd和地址，并分发
+ * 
+*/
+void TcpServer::NewConnection(int sockfd, const InetAddress& peer_addr) {
+    EventLoop* io_loop = p_thread_pool_->GetNextLoop(); /* 轮询算法得到一个IOLoop */
+    char buf[64] = {0};
+    snprintf( buf,sizeof buf, "-%s#%d", ip_port_.c_str(), next_connid_ ); /* 设置conn名 */
+    ++next_connid_; /* NewConnection只会在main thread中执行，所以不需要考虑多线程 */
+    std::string conn_name = name_ + buf;
+
+    INFO( "TcpServer::newConnection [{}] - new connection [{}] from {}.",
+         name_, conn_name, peer_addr.ToIpPort() );
+    
+    // 通过sockfd 获取其绑定的主机ip 和端口, 即获取本机InetAddress
+    sockaddr_in local;
+    ::bzero(&local, sizeof local);
+    socklen_t addrlen = sizeof local;
+    if (::getsockname(sockfd, (sockaddr*)&local, &addrlen) < 0)
+    {
+        ERROR("sockets::getLocalAddr");
+    }
+    InetAddress local_addr(local);
+
+    // 根据连接成功的sockfd，创建TcpConnection连接对象
+    TcpConnectionPtr conn(
+        new TcpConnection( io_loop, conn_name, sockfd, local_addr, peer_addr )
+    );
+    conns_[conn_name] = conn;
+
+    // 下面的回调都是用户设置给TcpServer=>TcpConnection=>Channel=>Poller=>notify channel调用回调
+    conn->set_conn_cb(conn_cb_);
+    conn->set_msg_cb(msg_cb_);
+    conn->set_written_cb(written_cb_);
+
+    // 设置了如何关闭连接的回调   conn->shutdown()，注册关闭conn的回调
+    conn->set_close_cb(
+        std::bind(&TcpServer::RemoveConnection, this, std::placeholders::_1)
+    );
+
+     // 直接调用TcpConnection::connectEstablished, 设置连接完成
+    io_loop->RunInLoop(
+        std::bind( &TcpConnection::ConnectEstablished, conn )
+    );
+
+}
+
+
 /// Thread safe.
-void TcpServer::RemoveConnection(const TcpConnectionPtr& conn){}
+void TcpServer::RemoveConnection(const TcpConnectionPtr& conn) {
+    loop_->RunInLoop(
+        std::bind( &TcpServer::RemoveConnectionInLoop, this, conn )
+    );
+}
+
 /// Not thread safe, but in loop
-void TcpServer::RemoveConnectionInLoop(const TcpConnectionPtr& conn){}
+void TcpServer::RemoveConnectionInLoop(const TcpConnectionPtr& conn) {
+    INFO( "TcpServer::removeConnectionInLoop [%s] - connection %s", name_, conn->name() );
+    conns_.erase( conn->name() );
+    EventLoop* io_loop = conn->loop();
+    io_loop->QueueInLoop(
+        std::bind( &TcpConnection::ConnectDestroyed, conn )
+    );
+}

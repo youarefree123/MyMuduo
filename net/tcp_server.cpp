@@ -47,7 +47,7 @@ TcpServer::~TcpServer() {
     /* 销毁每个连接 */
     for( auto& it : conns_ ) {
         TcpConnectionPtr p_conn(it.second); 
-        p_conn.reset(); // v引用计数-1, v 是 shared_ptr
+        it.second.reset(); // v引用计数-1, v 是 shared_ptr
         p_conn->loop()->RunInLoop(
             std::bind( &TcpConnection::ConnectDestroyed, p_conn )
         ); 

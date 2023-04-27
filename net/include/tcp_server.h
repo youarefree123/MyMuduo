@@ -4,9 +4,10 @@
 #include <string>
 #include <atomic>
 
-#include "callbacks.h"
+
 #include "event_loop.h"
 #include "acceptor.h"
+#include "tcp_connection.h"
 #include "inet_address.h"
 #include "noncopyable.h"
 #include "eventloop_thread_pool.h"
@@ -19,7 +20,7 @@ class TcpServer
 public:
     // EvenetLoopThread 的 thread_func() 调用
     using ThreadInitCallback = std::function<void( EventLoop* )>;
-    using ConnctionMap = std::unordered_map< std::string, TcpConnectionPtr >;
+   
 
     // 是否重用端口
     enum Option {
@@ -60,6 +61,9 @@ public:
 
 
 private:
+
+     using ConnctionMap = std::unordered_map< std::string, TcpConnectionPtr >;
+
     /// Not thread safe, but in loop
     void NewConnection(int sockfd, const InetAddress& peerAddr);
     /// Thread safe.

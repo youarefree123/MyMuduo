@@ -47,7 +47,7 @@ class TcpConnection : noncopyable,
 
 public:
 
-    using Buffer = UnlimitedBuffer; 
+    // using Buffer = UnlimitedBuffer; 
     // using Buffer = BaseBuffer; /* 使用原buffer */ 
 
     explicit TcpConnection( EventLoop* loop,
@@ -64,9 +64,9 @@ public:
     bool Connected() const { return state_ == kConnected; }
     bool Disconnected() const { return state_ == kDisconnected; }
 
-    // void send(string&& message); // C++11
-    // void send(Buffer&& message); // C++11
-    void Send( const void* message, int len ); /* C++11是不是可以优化？ */
+    void send(string&& message); // C++11
+    // void send(UnlimitedBuffer&& message); // C++11
+    // void Send( const void* message, int len ); /* C++11是不是可以优化？ */
     
     void Shutdown(); /* 线程不安全 */
     void ShutdownInLoop(); 
@@ -144,7 +144,7 @@ private:
 
     size_t high_water_mark_; /* 高水位线 */
 
-    Buffer input_buffer_; 
-    Buffer output_buffer_;
+    UnlimitedBuffer input_buffer_;  /* 接收缓冲区（conn接收） */
+    UnlimitedBuffer output_buffer_; /* 发送缓冲区( conn发送 ) */
 
 };

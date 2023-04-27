@@ -1,12 +1,17 @@
 #include <functional>
 #include <cassert>
 #include <memory>
+#include <unistd.h>
+#include <sys/types.h>          /* See NOTES */
+#include <sys/socket.h>
+#include <errno.h>
 
 #include "log.h"
 #include "tcp_connection.h"
 #include "callbacks.h"
 #include "socket_wrapper.h"
 #include "event_loop.h"
+#include "unlimited_buffer.h"
 #include "channel.h"
 
 // 和tcpserver的冗余了，能不能合并，在哪合并
@@ -34,20 +39,20 @@ TcpConnection::TcpConnection( EventLoop* loop,
 {
     // channel 布置Pooler通知后执行的回调函数
     channel_->set_read_callback(
-        std::bind( &TcpConnection::, this, std::placeholders::_1 )
+        std::bind( &TcpConnection::HandleRead, this, std::placeholders::_1 )
     );
     channel_->set_write_callback(
         std::bind( &TcpConnection::HandleWrite, this )
     );
     channel_->set_close_callback(
-        std::bind( &TcpConnection::HandleWrite, this )
+        std::bind( &TcpConnection::HandleClose, this )
     );
     channel_->set_error_callback(
         std::bind( &TcpConnection::HandleError, this )
     );
 
     DEBUG( "name = {}, fd = {}", name_, sockfd );
-    socket_.set_keep_alive( true );
+    socket_->set_keep_alive( true );
 }
 
 TcpConnection::~TcpConnection() {
@@ -129,10 +134,41 @@ void TcpConnection::HandleClose() {
 }
 
 
+void TcpConnection::HandleError() {
+    int optval;
+    socklen_t optlen = sizeof optval;
+    int err = 0;
+    if( ::getsockopt( channel_->fd(), SOL_SOCKET, SO_ERROR, &optval, &optlen ) < 0 ) {
+        err = errno;
+    }
+    else {
+        err = optval;
+    }
+    ERROR( "TcpConnection::HandleError" );
+}
 
-// void send(string&& message); // C++11
-// void send(Buffer&& message); // C++11
-void TcpConnection::Send( const void* message, int len ){} /* C++11是不是可以优化？ */
+
+// c++ 11
+void TcpConnection::send( string&& message ) {
+    if( state_ == kConnected ) {
+        // 确认是否在同一线程
+        if( loop_->IsInLoopThread() ) {
+            
+        }
+
+
+    }
+    else {
+        ERROR( "TcpConnection::send" );
+    }
+} 
+// void send(UnlimitedBuffer&& message) {  // C++11
+//     if( state_ == kConnected )
+// }
+// void TcpConnection::Send( const void* message, int len ){} /* C++11是不是可以优化？ */
+
+
+
 
 
 void TcpConnection::Shutdown() {

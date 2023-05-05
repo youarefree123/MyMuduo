@@ -34,8 +34,9 @@ public:
     void PopOutput(const size_t len);
     // 为了兼容muduo
     void Retrieve( const size_t len ) { PopOutput(len); }
+    std::string RetrieveAll() { return HasRead( ReadableBytes() ); }
     
-    // 取前len个字符
+    // 取前len个字符,不删除
     std::string PeekOutput(const size_t len) const;
 
     void EndInput() { _input_ended = true; }  // 设置写结束
@@ -47,7 +48,8 @@ public:
 
     
     size_t BytesWritten() const { return _nwritten; } /* 已写数  */
-    size_t ReadableBytes() const { return _nread; } /*  已读数 */
+
+    size_t ReadableBytes() const { return _size; } /*  可读数 */
 
     ssize_t ReadFd( int fd) ;
     ssize_t WriteFd( int fd ) ;

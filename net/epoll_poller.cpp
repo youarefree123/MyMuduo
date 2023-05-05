@@ -68,8 +68,8 @@ Timestamp EpollPoller::Poll( int timeout_ms, ChannelList* active_channels ) {
 */
 void EpollPoller::UpdateChannel( Channel* channel ) {
     const int fd_status = channel->fd_status();
-    TRACE( "Before UpdateChannel : fd = {}, events = {}, fd_status = {}", \
-            channel->fd(), channel->events(), channel->fd_status() );
+    // TRACE( "Before UpdateChannel : fd = {}, events = {}, fd_status = {}", \
+    //         channel->fd(), channel->events(), channel->fd_status() );
     int fd = channel->fd();
     // 未监听fd，或者是已删除监听的fd
     // 问题：如果我KNew和KDeleted的Channel add一个空事件会怎么样？
@@ -102,8 +102,8 @@ void EpollPoller::UpdateChannel( Channel* channel ) {
 
     }
 
-    TRACE( "After UpdateChannel : fd = {}, events = {}, fd_status = {}", \
-            channel->fd(), channel->events(), channel->fd_status() );
+    TRACE( "After UpdateChannel : fd = {}, events = {}, fd_status = {}, loop = {}", \
+            channel->fd(), channel->events(), channel->fd_status(), reinterpret_cast<size_t>( channel->owner_loop() )  );
 } 
 
 /**
@@ -120,8 +120,6 @@ void EpollPoller::RemoveChannel( Channel* channel ) {
     assert(channel->IsNoneEvent());
 
     int fd_status = channel->fd_status();
-    TRACE( "Before RemoveChannel fd = {}, events = {}, fd_status = {}", \
-            channel->fd(), channel->events(), channel->fd_status() );
     assert( fd_status == KAdded || fd_status == KDeleted );
     size_t num = channels_.erase( fd ); 
     assert( num == 1 );

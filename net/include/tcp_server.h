@@ -83,7 +83,7 @@ private:
     WriteCompletedCallback written_cb_; /* 消息发送完成的回调 */
 
     ThreadInitCallback thread_init_cb_; /* 线程初始化回调 */
-    std::atomic<int> started_; /**/
+    std::atomic<int> started_; /*需要初始化，保证一个server只能被start一次*/
     
     int next_connid_; /*  */ 
     ConnctionMap conns_; /* 维护所有连接 k:v */

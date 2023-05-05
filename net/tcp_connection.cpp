@@ -153,6 +153,7 @@ void TcpConnection::Send( const string& buf ) {
     if( state_ == kConnected ) {
         // 确认是否在同一线程,是的话直接SendInLoop
         if( loop_->IsInLoopThread() ) {
+            DEBUG( "loop_->IsInLoopThread(), buf = {}", buf );  
             SendInLoop( buf.c_str(), buf.size() );
         }
         else {
@@ -185,9 +186,12 @@ void TcpConnection::SendInLoop(const void* message, size_t len) {
          CRITICAL( "disconnected give up writing!" );
     }
 
+   
+
     // 如果channel_ 第一次开始写数据，并且缓冲区中没有待发送数据，先去尽力写一次，能一次写完就不用设置Epoll写事件了
     if( !channel_->IsWriting() && output_buffer_.ReadableBytes() == 0 ) {
         nwrote = ::write( channel_->fd(), message, len );
+        DEBUG(" SendInLoop written {} byte ", nwrote );
         if( nwrote < 0 ) { // 错误处理, 参照原有的
             nwrote = 0;
             if (errno != EWOULDBLOCK) {
@@ -241,6 +245,7 @@ void TcpConnection::SendInLoop(const void* message, size_t len) {
 
 
 void TcpConnection::Shutdown() {
+    TRACE(" Shutdown: state_ = {} ",state_);
     if( state_ == kConnected ) {
         set_state( kDisconnecting );
         loop_->RunInLoop( 

@@ -24,7 +24,7 @@ public:
         );
 
         // 设置合适的loop线程数量 loopthread
-        server_.set_thread_num(3);
+        server_.set_thread_num(2);
     }
     void Start()
     {
@@ -49,9 +49,11 @@ private:
                 UnlimitedBuffer *buf,
                 Timestamp time)
     {
-        std::string msg = "11111111111\n";
+        std::string msg = buf->RetrieveAll();
+        INFO( "current loop = {},  The msg = {}", reinterpret_cast<size_t>( conn->loop() ) , msg );
         conn->Send(msg);
-        conn->Shutdown(); // 写端   EPOLLHUP =》 closeCallback_
+        // conn->Shutdown(); // 写端   EPOLLHUP =》 closeCallback_
+        
     }
 
     EventLoop *loop_;
@@ -60,6 +62,7 @@ private:
 
 int main()
 {
+    ONLY_TO_CONSOLE; LOGINIT(); LOG_LEVEL_TRACE;
     EventLoop loop;
     InetAddress addr(8000);
     EchoServer server(&loop, addr, "EchoServer-01"); // Acceptor non-blocking listenfd  create bind 

@@ -25,6 +25,7 @@ TcpServer::TcpServer( EventLoop* loop,
     p_thread_pool_( new EventLoopThreadPool( loop, name_ ) ),
     conn_cb_(  ), 
     msg_cb_( ),
+    started_(0),
     next_connid_( 1 )
     
 {

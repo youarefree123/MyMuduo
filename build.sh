@@ -8,10 +8,10 @@ if [ ! -d `pwd`/build ]; then
 fi
 
 # 清空
-rm -rf `pwd`/build/*
+# rm -rf `pwd`/build/*
 
 # 编译
 cd `pwd`/build &&
     cmake .. && 
     make -j8
-cd ..
+# cd ..

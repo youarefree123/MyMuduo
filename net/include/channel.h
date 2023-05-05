@@ -62,8 +62,8 @@ public:
 
     // 返回fd当前注册的事件状态
     bool IsNoneEvent() const { return events_ == kNoneEvent; }
-    bool IsReading() const { return events_ & kWriteEvent; }
-    bool IsWriting() const { return events_ & kReadEvent; }
+    bool IsReading() const { return events_ & kReadEvent; }
+    bool IsWriting() const { return events_ & kWriteEvent; }
 
     int fd_status() { return fd_status_; }
     void set_fd_status( int idx ) { fd_status_ = idx; }

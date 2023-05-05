@@ -37,7 +37,7 @@ std::string UnlimitedBuffer::HasRead(const size_t len) {
 }
 
 
-string UnlimitedBuffer::PeekOutput(const size_t len) const { return _stream_buffer.Concatenate(min(len, _size)); }
+std::string UnlimitedBuffer::PeekOutput(const size_t len) const { return _stream_buffer.Concatenate(min(len, _size)); }
 
 // 要么取len个，要么取完
 void UnlimitedBuffer::PopOutput(const size_t len) {
@@ -46,6 +46,8 @@ void UnlimitedBuffer::PopOutput(const size_t len) {
     _size -= l;
     _nread += l;
 }
+
+
 
 // void UnlimitedBuffer::EndInput() { _input_ended = 1; }
 

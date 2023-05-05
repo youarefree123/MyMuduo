@@ -27,7 +27,7 @@
 class Logger final : noncopyable {
 public:
     static Logger& Instance();
-    bool init(const std::string& filePath = "../logs/log", 
+    bool init(const std::string& filePath = "./logs/log", 
             const std::string& loggerName = "Logger",
             spdlog::level::level_enum level = spdlog::level::info);
 

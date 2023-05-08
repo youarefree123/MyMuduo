@@ -223,6 +223,7 @@ void TcpConnection::SendInLoop(const void* message, size_t len) {
         size_t old_len = output_buffer_.ReadableBytes(); /* buffer里的待发送数据 */
         
         // 如果触发了高水位（高水位的触发一定是原buffer里水位没触发，加了old_len后超过，并且设置了高水位触发回调）, 执行高水位回调
+        // TcpServer 里好像没有设置该回调的函数啊。后期加一下 
         if( old_len + remaining >= high_water_mark_ && 
             old_len < high_water_mark_ &&
             high_water_mark_cb_ )

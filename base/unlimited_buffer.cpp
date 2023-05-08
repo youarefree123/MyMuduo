@@ -77,6 +77,7 @@ ssize_t UnlimitedBuffer::ReadFd( int fd ) {
 }
 
 // Todo: 可能一次性没读完，如何判断每个iovecs的offset
+// 慎用weitev
 ssize_t UnlimitedBuffer::WriteFd( int fd ) {
     vector<iovec> iovecs = _stream_buffer.as_iovecs();
     ssize_t len = writev( fd, &iovecs[0], iovecs.size() ); /* 不一定一次读完，要如何处理 */
@@ -87,6 +88,6 @@ ssize_t UnlimitedBuffer::WriteFd( int fd ) {
     if( len != size() ) {
         CRITICAL( "UnlimitedBuffer::WriteFd Failed, writev()" );
     }
-    PopOutput(len); // 已读len个字节 
+    // PopOutput(len); // 已读len个字节 
     return len;
 }

@@ -64,7 +64,7 @@ void TcpServer::set_thread_num( int num_threads ) {
     p_thread_pool_->set_thread_num( num_threads );
 } 
   
-//线程开启，然后主loop执行监听
+// 初始化所有SubLoop， acceptor设置监听
 void TcpServer::Start() {
     // started_ 原子的，保证start实际只执行一次
     if( started_++ == 0 ) {
@@ -82,13 +82,13 @@ void TcpServer::Start() {
 
 /// Not thread safe, but in loop
 /**
- * 每当有一个新的Conn连接，Acceptor就会执行一次该回调，来绑定这个连接的fd和地址，并分发
+ * 每当有一个新的Conn连接，Acceptor就会执行一次该回调，来绑定这个对端连接的fd和地址，并分发
  * 
 */
 void TcpServer::NewConnection(int sockfd, const InetAddress& peer_addr) {
-    EventLoop* io_loop = p_thread_pool_->GetNextLoop(); /* 轮询算法得到一个IOLoop */
+    EventLoop* io_loop = p_thread_pool_->GetNextLoop(); /* 轮询算法得到一个IOLoop ,如果没有设置多loop的情况下每次返回的都是mainloop*/
     char buf[64] = {0};
-    snprintf( buf,sizeof buf, "-%s#%d", ip_port_.c_str(), next_connid_ ); /* 设置conn名 */
+    snprintf( buf,sizeof buf, "-%s#%d", ip_port_.c_str(), next_connid_ ); /* 设置新conn的名程 */
     ++next_connid_; /* NewConnection只会在main thread中执行，所以不需要考虑多线程 */
     std::string conn_name = name_ + buf;
 
@@ -99,6 +99,8 @@ void TcpServer::NewConnection(int sockfd, const InetAddress& peer_addr) {
     sockaddr_in local;
     ::bzero(&local, sizeof local);
     socklen_t addrlen = sizeof local;
+
+    // 从已连接的fd的四元组（本地ip port， 远端ip port）中拿到本机地址
     if (::getsockname(sockfd, (sockaddr*)&local, &addrlen) < 0)
     {
         ERROR("sockets::getLocalAddr");

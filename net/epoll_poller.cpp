@@ -42,7 +42,7 @@ Timestamp EpollPoller::Poll( int timeout_ms, ChannelList* active_channels ) {
     // 处理事件
     if( num_events > 0 ) {
         TRACE( "{} envents happened", num_events );  
-        FillActiveChannels( num_events, active_channels );
+        FillActiveChannels( num_events, active_channels ); /* 根据拿到的events_list_ */
         //  自适应，如果一次没有取完，会自动扩容
         if( static_cast<size_t>( num_events ) == events_list_.size() ) {
         events_list_.resize( events_list_.size() * 2 );

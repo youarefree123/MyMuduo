@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 # 指定可执行文件名及源码
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../bin")
 
-add_subdirectory (http) # 指定 编译子目录
+# add_subdirectory (http) # 指定 编译子目录
 
 
 # 宏定义 add_test_exec

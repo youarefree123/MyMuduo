@@ -125,7 +125,7 @@ private:
     
     void SendInLoop(const void* message, size_t len);
     
-    EventLoop* loop_; /* conn对象都是在subloop中管理的，所以这里一定不是mainloop */
+    EventLoop* loop_; 
     const std::string name_;
     std::atomic<int> state_; 
     bool reading_; 

@@ -1,4 +1,4 @@
-# pragma once 
+#pragma once 
 
 
 #include <string>
@@ -39,6 +39,8 @@ public:
     EventLoop* loop() const { return loop_; }
 
     void set_thread_num( int num_threads ); 
+
+    // 默认为空
     void set_thread_init_callback( const ThreadInitCallback& cb ) { 
         thread_init_cb_ = cb;
     }
@@ -55,6 +57,8 @@ public:
     void set_msg_callback( const MessageCallback& cb ) {
         msg_cb_ = cb;
     }
+
+    // 写完成，低水位回调
     void set_written_callback( const WriteCompletedCallback& cb ) {
         written_cb_ = cb;
     }

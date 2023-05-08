@@ -56,9 +56,9 @@ void Acceptor::HandleRead() {
     InetAddress peer_addr{};
     int connfd = listen_socket_.Accept( &peer_addr );
 
-    if( connfd < 0 ) {
+    if( connfd < 0 ) { // 未成功accept的情况，需要通过预留的fd，来处理该链接。 那如果不处理会怎么样？
         ERROR("Acceptor::HandleRead");
-        // 如果文件描述符到了上限,先直接做丢弃
+        // 如果文件描述符到了上限,使用预留的指向空洞文件的fd，来关闭该链接
         if( errno == EMFILE ) {
             ::close(idle_fd_);
             idle_fd_ = ::accept(listen_socket_.fd(), NULL, NULL);
@@ -68,7 +68,7 @@ void Acceptor::HandleRead() {
     }
     else {
         // 对接收到的fd做初始化操作，如果没有注册过，则直接关闭
-        // new_conn_cb_ 何时注册的？
+        // new_conn_cb_ 何时注册的？ TcpServer 构造的时候，设置该server对应的唯一的acceptor的new_conn_cb
         if( new_conn_cb_ ) {
             // 传递给回调的是远端的fd和其对应的addr
             new_conn_cb_( connfd, peer_addr );

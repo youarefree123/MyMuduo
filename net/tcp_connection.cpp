@@ -129,8 +129,8 @@ void TcpConnection::HandleClose() {
     TcpConnectionPtr guard_this( shared_from_this() );
     conn_cb_( guard_this ); /* 用户注册的OnConnection 包含连接成功，建立，断开，所以在即将断开时需要执行对应回调.( 但是为啥需要guard_this？ ) */
 
-    // must be the last line
     close_cb_( guard_this );
+    // must be the last line
 }
 
 

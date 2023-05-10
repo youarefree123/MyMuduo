@@ -66,7 +66,7 @@ public:
 
 private:
 
-     using ConnctionMap = std::unordered_map< std::string, TcpConnectionPtr >;
+    using ConnctionMap = std::unordered_map< std::string, TcpConnectionPtr >;
 
     /// Not thread safe, but in loop
     void NewConnection(int sockfd, const InetAddress& peerAddr);

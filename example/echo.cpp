@@ -56,8 +56,9 @@ private:
                 UnlimitedBuffer *buf,
                 Timestamp time)
     {
+        INFO( "current loop = {},  The msg size = {}", reinterpret_cast<size_t>( conn->loop() ) , buf->size() );
         std::string msg = buf->RetrieveAll();
-        INFO( "current loop = {},  The msg = {}", reinterpret_cast<size_t>( conn->loop() ) , msg );
+        INFO( "msg = {}", msg );
         conn->Send(msg);
         // conn->Shutdown(); // 写端   EPOLLHUP =》 closeCallback_
         

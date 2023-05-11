@@ -2,9 +2,9 @@
 #include <stdexcept>
 
 #include "log.h"
-#include "unlimited_buffer.h"
+#include "net/base/unlimited_buffer.h"
 
-#define TOKEN_SIZE 65536
+#define TOKEN_SIZE 4096
 
 using namespace std;
 
@@ -72,21 +72,20 @@ ssize_t UnlimitedBuffer::ReadFd( int fd ) {
         // log 后面换
         CRITICAL( "Buffer::ReadFd" );
     } 
-    DEBUG("ReadFd(), len = {}", len);
     if( len > 0 ) HasWrite( std::string( _token,len ) ); // buff每次写len个字符,这里有问题，api不对
     return len;
 }
 
 // Todo: 可能一次性没读完，如何判断每个iovecs的offset
 // 慎用weitev
-ssize_t UnlimitedBuffer::WriteFd( int fd ) {
+ssize_t UnlimitedBuffer::WriteFd( int fd, size_t n ) {
     vector<iovec> iovecs = _stream_buffer.as_iovecs();
     ssize_t len = writev( fd, &iovecs[0], iovecs.size() ); /* 不一定一次读完，要如何处理 */
     if( len < 0 ) {
         perror("Buffer::WriteFd");
         exit(1);
     }
-    if( len != size() ) {
+    if( len != n ) {
         CRITICAL( "UnlimitedBuffer::WriteFd Failed, writev()" );
     }
     // PopOutput(len); // 已读len个字节 

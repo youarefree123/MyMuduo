@@ -3,7 +3,7 @@
 #include <functional>
 
 #include "net/inet_address.h"
-#include "net/base/noncopyable.h"
+#include "base/noncopyable.h"
 #include "net/socket_wrapper.h"
 #include "net/channel.h"
 

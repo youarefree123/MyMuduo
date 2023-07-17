@@ -7,7 +7,7 @@
 #include <atomic>
 #include <sys/types.h>
 
-#include "net/base/noncopyable.h"
+#include "base/noncopyable.h"
 
 /**
  * 一个ThreadWrapper对象，记录的就是一个新线程的详细信息

@@ -1,8 +1,8 @@
 #include <unistd.h>
 #include <stdexcept>
 
-#include "log.h"
-#include "net/base/unlimited_buffer.h"
+#include "base/log.h"
+#include "base/unlimited_buffer.h"
 
 #define TOKEN_SIZE 4096
 

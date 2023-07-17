@@ -1,5 +1,5 @@
-#include "current_thread.h"
-#include "timestamp.h"
+#include "base/current_thread.h"
+#include "base/timestamp.h"
 namespace CurrentThread {
 
 __thread int t_cached_tid = 0;

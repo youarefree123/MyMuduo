@@ -1,6 +1,6 @@
 #pragma once
 
-#include "net/base/noncopyable.h"
+#include "base/noncopyable.h"
 
 // struct tcp_info is in <netinet/tcp.h>
 struct tcp_info;

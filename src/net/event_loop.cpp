@@ -8,7 +8,7 @@
 #include "net/poller.h"
 #include "net/channel.h"
 #include "net/event_loop.h"
-#include "net/base/current_thread.h"
+#include "base/current_thread.h"
 namespace {
 
 // __thread 也就是thread_local 

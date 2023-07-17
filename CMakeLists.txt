@@ -1,9 +1,44 @@
 cmake_minimum_required(VERSION 3.20)
 
-set( PROJECT_NAME "webserver" )
+set( PROJECT_NAME "muduo" )
 set(CMAKE_CXX_STANDARD 17)
 # 设置优化等, 还有 -fPIC 的问题
 # set( CXX_FLAG... )
+
+
+if(UNIX)
+    if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+        # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
+        # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")  # Inhibit all warning messages.
+        set(CXX_FLAGS
+            -g
+            # -DVALGRIND
+            # -DMUDUO_STD_STRING
+            -DCHECK_PTHREAD_RETURN_VALUE
+            -D_FILE_OFFSET_BITS=64
+            -Wall
+            -Wextra
+            # -Werror
+            # -Wconversion
+            # -Wno-unused-parameter # 未使用参数
+            # -Wold-style-cast
+            -Wno-multichar
+            -Wno-unused-function
+            -Wno-reorder
+            -Woverloaded-virtual
+            -Wpointer-arith
+            # -Wshadow
+            -Wwrite-strings
+            -march=native
+            # -MMD
+            -std=c++0x
+            -rdynamic
+        )
+        string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}")
+    endif()
+endif()
+
+
 
 project(${PROJECT_NAME})
 
@@ -38,8 +73,6 @@ add_executable(${PROJECT_NAME}  main.cpp)
 target_include_directories (
   ${PROJECT_NAME} PUBLIC 
   ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/spdlog/include
-  # ${CMAKE_CURRENT_SOURCE_DIR}/base/include
-  
 )
 
 

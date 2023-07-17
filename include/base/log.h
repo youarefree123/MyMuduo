@@ -13,7 +13,7 @@
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/async.h" //support for async logging.
-#include "net/base/noncopyable.h"
+#include "base/noncopyable.h"
 #include <iostream>
 #include <memory>
 #include <chrono>

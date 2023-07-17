@@ -4,8 +4,8 @@
 #include <string>
 #include <condition_variable>
 
-#include "net/base/noncopyable.h"
-#include "net/base/thread_wrapper.h"
+#include "base/noncopyable.h"
+#include "base/thread_wrapper.h"
 
 /**
  *  绑定一个thread 和 loop ，打包成一个类

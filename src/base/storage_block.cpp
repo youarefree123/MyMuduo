@@ -1,4 +1,4 @@
-#include "storage_block.h"
+#include "base/storage_block.h"
 #include <stdexcept>
 using namespace std;
 
@@ -40,7 +40,7 @@ string BlockList::Concatenate() const {
     for (const auto &blk : _blocks) {
         ret.append(blk);
     }
-    return ret;
+    return Block( ret );
 }
 
 // blk.str() 是string_view,只有在合并的时候才会拷贝

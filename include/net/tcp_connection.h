@@ -5,10 +5,10 @@
 #include <atomic>
 
 #include "net/callbacks.h"
-#include "net/base/unlimited_buffer.h"
+#include "base/unlimited_buffer.h"
 #include "net/inet_address.h"
-#include "net/base/noncopyable.h"
-#include "net/base/timestamp.h"
+#include "base/noncopyable.h"
+#include "base/timestamp.h"
 
 class Channel;
 class EventLoop;

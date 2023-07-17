@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "net/base/noncopyable.h"
+#include "base/noncopyable.h"
 
 class EventLoop;
 class EventLoopThread;

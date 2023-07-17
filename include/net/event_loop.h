@@ -6,9 +6,9 @@
 #include <mutex>
 #include <functional>
 
-#include "net/base/current_thread.h"
-#include "net/base/timestamp.h"
-#include "net/base/noncopyable.h"
+#include "base/current_thread.h"
+#include "base/timestamp.h"
+#include "base/noncopyable.h"
 
 
 class Channel;

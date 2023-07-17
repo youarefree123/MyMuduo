@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <functional>
-#include "net/base/timestamp.h"
+#include "base/timestamp.h"
 
 
 class UnlimitedBuffer;

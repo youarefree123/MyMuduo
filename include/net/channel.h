@@ -5,8 +5,8 @@
 #include <string>
 using std::string;
 
-#include "net/base/noncopyable.h"
-#include "net/base/timestamp.h"
+#include "base/noncopyable.h"
+#include "base/timestamp.h"
 
 class EventLoop;
 

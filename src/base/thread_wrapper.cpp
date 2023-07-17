@@ -4,9 +4,9 @@
 #include <memory>
 #include <semaphore.h>
 
-#include "current_thread.h"
-#include "thread_wrapper.h"
-#include "log.h"
+#include "base/current_thread.h"
+#include "base/thread_wrapper.h"
+#include "base/log.h"
 
 
 

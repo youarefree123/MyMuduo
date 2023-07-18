@@ -15,7 +15,8 @@ macro (add_exec exec_name)
 endmacro (add_exec)
 
 add_exec(echo)
-add_exec(banch)
+add_exec(muduo_echo)
+# add_exec(banch)
 
 
 

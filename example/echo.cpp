@@ -18,19 +18,20 @@ public:
             std::bind(&EchoServer::onConnection, this, std::placeholders::_1)
         );
 
+        // 设置收到消息的回调
         server_.set_msg_callback(
             std::bind(&EchoServer::onMessage, this,
                 std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
         );
 
-         // test set_server
+         // test set_server 设置线程初始化操作回调
         server_.set_thread_init_callback( 
             []( EventLoop* loop ){
                 INFO( "This Loop is {}, call set_thread_init_callback()", reinterpret_cast<size_t>(loop) );
             }
         );
 
-        // 设置合适的loop线程数量 loopthread
+        // 设置合适的loop线程数量 loopthread， 0 用于操作
         server_.set_thread_num(0);
     }
     void Start()
@@ -60,7 +61,7 @@ private:
         std::string msg = buf->RetrieveAll();
         INFO( "msg = {}", msg );
         conn->Send(msg);
-        // conn->Shutdown(); // 写端   EPOLLHUP =》 closeCallback_
+        conn->Shutdown(); // 写端   EPOLLHUP =》 closeCallback_
         
     }
 
@@ -72,7 +73,7 @@ private:
 
 int main()
 {
-    ONLY_TO_CONSOLE; LOGINIT(); LOG_LEVEL_TRACE;
+    ONLY_TO_CONSOLE; LOGINIT(); LOG_LEVEL_TRACE; // 只输出在控制台，TRACE级别
     EventLoop loop;
     InetAddress addr(8000);
     

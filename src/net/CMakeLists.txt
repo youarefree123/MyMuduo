@@ -20,10 +20,9 @@ add_library(
 
 # # 指定链接库
 target_link_libraries(
-  net PUBLIC
-  log
-  pthread 
-  ) 
+    net PUBLIC
+    base
+) 
 
 # add_subdirectory (tests) # 指定 编译子目录
 

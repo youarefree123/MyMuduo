@@ -40,7 +40,7 @@ string BlockList::Concatenate() const {
     for (const auto &blk : _blocks) {
         ret.append(blk);
     }
-    return Block( ret );
+    return ret;
 }
 
 // blk.str() 是string_view,只有在合并的时候才会拷贝

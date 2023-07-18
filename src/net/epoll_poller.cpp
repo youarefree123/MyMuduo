@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <sys/epoll.h>
 
-#include "log.h"
+#include "base/log.h"
 #include "net/channel.h"
 #include "net/poller.h"
 #include "net/epoll_poller.h"
@@ -68,7 +68,7 @@ Timestamp EpollPoller::Poll( int timeout_ms, ChannelList* active_channels ) {
 */
 void EpollPoller::UpdateChannel( Channel* channel ) {
     const int fd_status = channel->fd_status();
-    // TRACE( "Before UpdateChannel : fd = {}, events = {}, fd_status = {}", \
+    // TRACE( "Before UpdateChannel : fd = {}, events = {}, fd_status = {}", 
     //         channel->fd(), channel->events(), channel->fd_status() );
     int fd = channel->fd();
     // 未监听fd，或者是已删除监听的fd

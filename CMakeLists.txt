@@ -6,46 +6,52 @@ set(CMAKE_CXX_STANDARD 17)
 # set( CXX_FLAG... )
 
 
-if(UNIX)
-    if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
-        # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")  # Inhibit all warning messages.
-        set(CXX_FLAGS
-            -g
-            # -DVALGRIND
-            # -DMUDUO_STD_STRING
-            -DCHECK_PTHREAD_RETURN_VALUE
-            -D_FILE_OFFSET_BITS=64
-            -Wall
-            -Wextra
-            # -Werror
-            # -Wconversion
-            # -Wno-unused-parameter # 未使用参数
-            # -Wold-style-cast
-            -Wno-multichar
-            -Wno-unused-function
-            -Wno-reorder
-            -Woverloaded-virtual
-            -Wpointer-arith
-            # -Wshadow
-            -Wwrite-strings
-            -march=native
-            # -MMD
-            -std=c++0x
-            -rdynamic
-        )
-        string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}")
-    endif()
-endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")  # Inhibit all warning messages.
+set(CXX_FLAGS
+    -g
+    # -DVALGRIND
+    # -DMUDUO_STD_STRING
+    -DCHECK_PTHREAD_RETURN_VALUE
+    -D_FILE_OFFSET_BITS=64
+    -Wall
+    -Wextra
+    # -Werror
+    # -Wconversion
+    # -Wno-unused-parameter # 未使用参数
+    # -Wold-style-cast
+    -Wno-multichar
+    -Wno-unused-function
+    -Wno-reorder
+    -Woverloaded-virtual
+    -Wpointer-arith
+    # -Wshadow
+    -Wwrite-strings
+    -march=native
+    # -MMD
+    -std=c++0x
+    -rdynamic
+
+    -fPIC
+)
+string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}")
+
 
 
 
 project(${PROJECT_NAME})
 
+# 设置 bin 目录
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/bin")
+# 设置Lib 目录
+set(LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
+# 设置头文件目录
+set( INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include" )
 
-# 指定头文件搜索路径（）
-# target_include_directories (${CMAKE_CURRENT_SOURCE_DIR}/base  )
+# 设置第三方目录
+set(3rd_PATH "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty")
+
 
 # include_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/spdlog )
 
@@ -58,21 +64,23 @@ project(${PROJECT_NAME})
 
 
 
-add_subdirectory ("base") # 指定 编译子目录
-add_subdirectory ("net") # 指定 编译子目录
+add_subdirectory ("src/base") # 指定 编译子目录
+add_subdirectory ("src/net") # 指定 编译子目录
 add_subdirectory ("example") # 指定 编译子目录
 
 
-set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 # 指定可执行文件名及源码
 add_executable(${PROJECT_NAME}  main.cpp)
 
 
+
 # 指定头文件
+# 指定头文件搜索路径（）
 target_include_directories (
   ${PROJECT_NAME} PUBLIC 
   ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/spdlog/include
+  ${INCLUDE_PATH}
 )
 
 

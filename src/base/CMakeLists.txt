@@ -1,9 +1,3 @@
-cmake_minimum_required(VERSION 3.20)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fPIC")
-
-
-set(LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../lib")
 # 遍历当前目录和子目录
 # file(GLOB_RECURSE SRC_DIR_LIST "./*.cpp")
 
@@ -14,22 +8,23 @@ message("base---${PROJECT_SOURCE_DIR}")
 
 add_library(
         base 
+        STATIC
         # SHARED
         ${SRC_DIR_LIST}									
 ) 
 
 target_include_directories (
   base PUBLIC 
-  ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/spdlog/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${3rd_PATH}/spdlog/include
+  ${INCLUDE_PATH}
 )
 
 
 target_link_libraries(
-  base
+  base PUBLIC
   pthread
 ) 
 
 
-add_subdirectory (tests) # 指定 编译子目录
+# add_subdirectory (tests) # 指定 编译子目录
 

@@ -98,7 +98,7 @@ add_subdirectory ("src/net") # 指定 编译子目录
 add_subdirectory ("example") # 指定 编译子目录
 
 
-set( BUILD_TEST false )
+set( BUILD_TEST true )
 
 if(BUILD_TEST)
     add_subdirectory ("tests") # 指定 编译子目录

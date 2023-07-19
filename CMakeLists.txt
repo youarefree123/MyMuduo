@@ -98,6 +98,12 @@ add_subdirectory ("src/net") # 指定 编译子目录
 add_subdirectory ("example") # 指定 编译子目录
 
 
+set( BUILD_TEST false )
+
+if(BUILD_TEST)
+    add_subdirectory ("tests") # 指定 编译子目录
+endif()
+
 
 # 指定可执行文件名及源码
 add_executable(${PROJECT_NAME}  main.cpp)

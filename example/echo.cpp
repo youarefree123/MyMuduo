@@ -54,11 +54,11 @@ private:
 
     // 可读写事件回调
     void onMessage(const TcpConnectionPtr &conn,
-                UnlimitedBuffer *buf,
+                Buffer *buf,
                 Timestamp time)
     {
-        INFO( "current loop = {},  The msg size = {}", reinterpret_cast<size_t>( conn->loop() ) , buf->size() );
-        std::string msg = buf->RetrieveAll();
+        INFO( "current loop = {},  The msg size = {}", reinterpret_cast<size_t>( conn->loop() ) , buf->ReadableBytes() );
+        std::string msg = buf->RetrieveAllAsString();
         INFO( "msg = {}", msg );
         conn->Send(msg);
         conn->Shutdown(); // 写端   EPOLLHUP =》 closeCallback_

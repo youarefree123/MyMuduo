@@ -62,7 +62,8 @@ TcpConnection::~TcpConnection() {
 
 void TcpConnection::HandleRead( Timestamp receive_time ) {
     loop_->AssertInLoopThread();
-    ssize_t n = input_buffer_.ReadFd( channel_->fd() );
+    int save_error = 0;
+    ssize_t n = input_buffer_.ReadFd( channel_->fd(), &save_error );
     if( n > 0 ) {
         // 已建立连接的用户，有可读事件发生后，需要去读一下buffer
         msg_cb_( shared_from_this(), &input_buffer_, receive_time );
@@ -71,7 +72,7 @@ void TcpConnection::HandleRead( Timestamp receive_time ) {
         HandleClose();
     }
     else {
-        ERROR( "TcpConnection::HandleRead" );
+        ERROR( "TcpConnection::HandleRead, save_error = {}", save_error );
         HandleError();
     }
 }
@@ -79,7 +80,9 @@ void TcpConnection::HandleRead( Timestamp receive_time ) {
 void TcpConnection::HandleWrite() {
     loop_->AssertInLoopThread();
     if( channel_->IsWriting() ) {
-        ssize_t n = output_buffer_.WriteFd( channel_->fd(), output_buffer_.ReadableBytes() );  
+        // ssize_t n = output_buffer_.WriteFd( channel_->fd(), output_buffer_.ReadableBytes() ); 
+        int save_error = 0;
+        ssize_t n = output_buffer_.WriteFd( channel_->fd(), &save_error );  
 
         if( n > 0 ) {
             output_buffer_.Retrieve(n); 
@@ -105,7 +108,7 @@ void TcpConnection::HandleWrite() {
         }
         // 如果没读到数据
         else {
-            ERROR("HandleWrite ERROR, no data is wrriten");
+            ERROR("HandleWrite ERROR, no data is wrriten,save_error = {}", save_error);
         }
     }
     else {
@@ -137,14 +140,14 @@ void TcpConnection::HandleClose() {
 void TcpConnection::HandleError() {
     int optval;
     socklen_t optlen = sizeof optval;
-    int err = 0;
     if( ::getsockopt( channel_->fd(), SOL_SOCKET, SO_ERROR, &optval, &optlen ) < 0 ) {
-        err = errno;
+        optval = errno;
     }
-    else {
-        err = optval;
-    }
-    ERROR( "TcpConnection::HandleError" );
+
+    // 临时的
+    char t_errnobuf[512];
+    ERROR( "TcpConnection::HandleError, optval = {}",strerror_r(optval, t_errnobuf, sizeof t_errnobuf) );
+
 }
 
 

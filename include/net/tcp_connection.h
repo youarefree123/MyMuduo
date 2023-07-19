@@ -5,7 +5,8 @@
 #include <atomic>
 
 #include "net/callbacks.h"
-#include "base/unlimited_buffer.h"
+#include "base/buffer.h"
+// #include "base/unlimited_buffer.h"
 #include "net/inet_address.h"
 #include "base/noncopyable.h"
 #include "base/timestamp.h"
@@ -145,7 +146,10 @@ private:
 
     size_t high_water_mark_; /* 高水位线 */
 
-    UnlimitedBuffer input_buffer_;  /* 接收缓冲区（conn接收） */
-    UnlimitedBuffer output_buffer_; /* 发送缓冲区( conn发送 ) */
+    // UnlimitedBuffer input_buffer_;  /* 接收缓冲区（conn接收） */
+    // UnlimitedBuffer output_buffer_; /* 发送缓冲区( conn发送 ) */
+
+    Buffer input_buffer_;  /* 接收缓冲区（conn接收） */
+    Buffer output_buffer_; /* 发送缓冲区( conn发送 ) */
 
 };

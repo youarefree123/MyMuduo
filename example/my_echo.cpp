@@ -27,12 +27,20 @@ private:
     void onConnection(const TcpConnectionPtr& conn) {
     }
 
+    // void onMessage(const TcpConnectionPtr &conn,
+    //             UnlimitedBuffer *buf,
+    //             Timestamp time) {
+
+    //             std::string msg = buf->RetrieveAll();
+    //             // muduo::string msg(buf->retrieveAllAsString());
+    //             conn->Send(msg);
+    // }
+
     void onMessage(const TcpConnectionPtr &conn,
-                UnlimitedBuffer *buf,
+                Buffer *buf,
                 Timestamp time) {
 
-                std::string msg = buf->RetrieveAll();
-                // muduo::string msg(buf->retrieveAllAsString());
+                std::string msg = buf->RetrieveAllAsString();
                 conn->Send(msg);
     }
 
@@ -48,7 +56,7 @@ int main(int argc, char** argv) {
 
     // muduo::g_logLevel = muduo::Logger::ERROR;
     // muduo::net::EventLoop loop;
-    ONLY_TO_CONSOLE; LOGINIT(); LOG_LEVEL_ERROR; // 只输出在控制台，LOG_LEVEL_ERROR级别
+    ONLY_TO_FILE; LOGINIT(); LOG_LEVEL_ERROR; // 只输出在控制台，LOG_LEVEL_ERROR级别
 
     EventLoop loop;
     InetAddress addr(port);

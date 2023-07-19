@@ -1,4 +1,6 @@
 #pragma once
+
+
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 // https://github.com/gabime/spdlog/issues/282  Why not use stream syntax
 // TODO : 需要异步 ？  
@@ -21,6 +23,7 @@
 #include <sstream>
 #include <atomic> 
 #include <stdlib.h>
+
 
 
 
@@ -66,7 +69,5 @@ private:
 #define LOGINIT_WITH_NAME(name) Logger::Instance().init("../logs/log.txt", name);
 #define ONLY_TO_CONSOLE Logger::Instance().onlyToConsole();
 #define ONLY_TO_FILE Logger::Instance().onlyToFile();
-
-
 
 

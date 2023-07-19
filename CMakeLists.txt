@@ -8,6 +8,35 @@ set(CMAKE_CXX_STANDARD 17)
 
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")  # Inhibit all warning messages.
+
+# set(CXX_FLAGS
+#     -O3
+#     # -DVALGRIND
+#     # -DMUDUO_STD_STRING
+#     -DCHECK_PTHREAD_RETURN_VALUE
+#     -D_FILE_OFFSET_BITS=64
+#     -Wall
+#     -Wextra
+#     # -Werror
+#     # -Wconversion
+#     # -Wno-unused-parameter # 未使用参数
+#     # -Wold-style-cast
+#     -Wno-multichar
+#     -Wno-unused-function
+#     -Wno-reorder
+#     -Woverloaded-virtual
+#     -Wpointer-arith
+#     # -Wshadow
+#     -Wwrite-strings
+#     -march=native
+#     # -MMD
+#     -std=c++0x
+#     -rdynamic
+
+#     -fPIC
+# )
+
+
 set(CXX_FLAGS
     -g
     # -DVALGRIND

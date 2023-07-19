@@ -5,7 +5,8 @@
 #include "base/timestamp.h"
 
 
-class UnlimitedBuffer;
+// class UnlimitedBuffer;
+class Buffer;
 class TcpConnection; // 避免循环引用
 
 using TcpConnectionPtr = std::shared_ptr<TcpConnection>; /* 为啥要用shared_ptr */
@@ -13,8 +14,11 @@ using ConnectionCallback = std::function<void(const TcpConnectionPtr&)>; /*  */
 using CloseCallback = std::function<void(const TcpConnectionPtr&)>; /*  */
 using WriteCompletedCallback = std::function<void(const TcpConnectionPtr&)>; /*  */
 
+// using MessageCallback = std::function<void( const TcpConnectionPtr&,
+//                                             UnlimitedBuffer*,
+//                                             Timestamp)>; /*  */
 using MessageCallback = std::function<void( const TcpConnectionPtr&,
-                                            UnlimitedBuffer*,
+                                            Buffer*,
                                             Timestamp)>; /*  */
 
 /// 高水位线回调

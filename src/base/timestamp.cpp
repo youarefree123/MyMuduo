@@ -8,8 +8,8 @@
 const size_t kMicroSecondsPerSecond = 1e6;
 
 Timestamp Timestamp::Now() {
-    auto tp =std::chrono::system_clock::now();
-    auto time=std::chrono::duration_cast<std::chrono::microseconds>(tp.time_since_epoch()).count();
+    auto tp = std::chrono::system_clock::now();
+    auto time = std::chrono::duration_cast<std::chrono::microseconds>(tp.time_since_epoch()).count();
     return  Timestamp( (size_t)time ) ;
 }
 

@@ -51,13 +51,13 @@ void ThreadWrapper::Start() {
     p_thread_ = std::move( std::make_unique<std::thread>( 
         [&](){
             tid_ = CurrentThread::Tid(); 
-            ::sem_post(&sem);
+            ::sem_post(&sem); // v 操作
             // 开启新线程，执行其对应线程函数
             func_();
         }   
      ) );
     
-    ::sem_wait(&sem); /*必须等待互殴去上面新线程的tid*/
+    ::sem_wait(&sem); /* p操作， 必须等待上面新线程的tid 获取完成 */ 
     assert( tid_ > 0 );
     
 } 

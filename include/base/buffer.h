@@ -88,7 +88,7 @@ public:
     std::string RetrieveAllAsString()
     {   
         // 应用可读取数据的长度
-        return RetrieveAsString(ReadableBytes());
+        return std::forward<std::string>( RetrieveAsString(ReadableBytes()) );
     }
 
     std::string RetrieveAsString(size_t len)

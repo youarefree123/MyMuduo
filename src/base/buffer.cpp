@@ -47,7 +47,7 @@ ssize_t Buffer::ReadFd(int fd, int *saveErrno)
     {
         *saveErrno = errno;
     }
-    else if (n <= writable) // Buffer的可写缓冲区已经够存储读出来的数据了
+    else if ( static_cast<size_t>( n ) <= writable) // Buffer的可写缓冲区已经够存储读出来的数据了
     {
         writerIndex_ += n;
     }

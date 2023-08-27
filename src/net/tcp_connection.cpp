@@ -5,6 +5,8 @@
 #include <sys/types.h>          /* See NOTES */
 #include <sys/socket.h>
 #include <errno.h>
+#include <string>
+
 
 #include "base/log.h"
 #include "net/tcp_connection.h"
@@ -76,6 +78,8 @@ void TcpConnection::HandleRead( Timestamp receive_time ) {
         HandleError();
     }
 }
+
+void TcpConnection::SetTcpNoDelay( bool flag ) { socket_->set_tcp_nodelay(flag); }
 
 void TcpConnection::HandleWrite() {
     loop_->AssertInLoopThread();
@@ -150,30 +154,49 @@ void TcpConnection::HandleError() {
 
 }
 
-
-
-void TcpConnection::Send( const string& buf ) {
+void TcpConnection::Send( Buffer* buf ) {
     if( state_ == kConnected ) {
-        // 确认是否在同一线程,是的话直接SendInLoop
         if( loop_->IsInLoopThread() ) {
-            DEBUG( "loop_->IsInLoopThread(), buf = {}", buf );  
-            SendInLoop( buf.c_str(), buf.size() );
+            DEBUG( "loop_->IsInLoopThread()" );  
+            SendInLoop( buf->Peek(), buf->ReadableBytes() );
+            buf->RetrieveAll();
         }
         else {
             // 这里RunInLoop中一定调用的是QueueInLoop吧，因为此时thread和loop不是对应的
             loop_->RunInLoop(
-                std::bind( &TcpConnection::SendInLoop, this, buf.c_str(), buf.size() )
+                // 这里的bind推断不出来类型（因为做了函数重载？！），需要显式绑定
+                std::bind< void(TcpConnection::*)(const string&) >( &TcpConnection::SendInLoop, this, buf->RetrieveAllAsString() )
             );
         }
+
     }
-    else {
-        ERROR( "TcpConnection::send" );
-    }
-} 
-// void send(UnlimitedBuffer&& message) {  // C++11
-//     if( state_ == kConnected )
-// }
-// void TcpConnection::Send( const void* message, int len ){} /* C++11是不是可以优化？ */
+    return;
+}
+
+// void TcpConnection::Send( const string& buf ) {
+//     if( state_ == kConnected ) {
+//         // 确认是否在同一线程,是的话直接SendInLoop
+//         if( loop_->IsInLoopThread() ) {
+//             DEBUG( "loop_->IsInLoopThread(), buf = {}", buf );  
+//             SendInLoop( buf.c_str(), buf.size() );
+//         }
+//         else {
+//             // 这里RunInLoop中一定调用的是QueueInLoop吧，因为此时thread和loop不是对应的
+//             loop_->RunInLoop(
+//                 std::bind( &TcpConnection::SendInLoop, this, buf.c_str(), buf.size() )
+//             );
+//         }
+//     }
+//     else {
+//         ERROR( "TcpConnection::send" );
+//     }
+// } 
+
+
+void TcpConnection::SendInLoop( const string& message ) {
+    SendInLoop( message.data(), message.size() );
+    return ;
+}
 
 /** 
  *  conn 发送数据时，应用发送过快，超过内核协议栈发送速度，则应用需要先将待发送数据写入buffer中，用以缓冲

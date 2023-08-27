@@ -25,7 +25,14 @@ public:
 
 private:
     void onConnection(const TcpConnectionPtr& conn) {
+        if (conn->Connected())
+        {
+            conn->SetTcpNoDelay(true);
+        }
     }
+    // void onConnection(const TcpConnectionPtr& conn) {
+        
+    // }
 
     // void onMessage(const TcpConnectionPtr &conn,
     //             UnlimitedBuffer *buf,
@@ -40,8 +47,8 @@ private:
                 Buffer *buf,
                 Timestamp time) {
 
-                std::string msg = buf->RetrieveAllAsString();
-                conn->Send(msg);
+                // std::string msg = buf->RetrieveAllAsString();
+                conn->Send(buf);
     }
 
     TcpServer server_;
@@ -56,6 +63,7 @@ int main(int argc, char** argv) {
 
     // muduo::g_logLevel = muduo::Logger::ERROR;
     // muduo::net::EventLoop loop;
+
     ONLY_TO_FILE; LOGINIT(); LOG_LEVEL_ERROR; // 只输出在控制台，LOG_LEVEL_ERROR级别
 
     EventLoop loop;

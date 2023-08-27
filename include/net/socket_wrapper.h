@@ -1,6 +1,8 @@
 #pragma once
 
+#include "base/log.h"
 #include "base/noncopyable.h"
+
 
 // struct tcp_info is in <netinet/tcp.h>
 struct tcp_info;
@@ -40,3 +42,12 @@ public:
 private:
     int sockfd_;
 };
+
+// 只支持网络套接字，TCP, 非阻塞， fork后子进程关闭,最后一个参数写0 也可以
+// SocketWrapper CreateNonblockSocket() {
+//     int sockfd = ::socket( AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC , 0 );
+//     if( sockfd < 0 ) {
+//         CRITICAL( "CreateNonblockFd failed." );
+//     }
+//     return SocketWrapper( sockfd );
+// }

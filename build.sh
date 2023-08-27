@@ -21,7 +21,7 @@ if [ ! -d `pwd`/build ]; then
 
     # ubuntu 会额外创建一个/usr/local/lib/x86_64-linux-gnu文件夹
     # 所以需要把库文件移出来
-    sudo cp -r /usr/local/lib/x86_64-linux-gnu/*.a /usr/local/lib/
+    # sudo cp -r /usr/local/lib/x86_64-linux-gnu/*.a /usr/local/lib/
 
     # 回到googletest目录
     cd ../

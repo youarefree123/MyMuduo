@@ -57,10 +57,10 @@ private:
                 Buffer *buf,
                 Timestamp time)
     {
-        INFO( "current loop = {},  The msg size = {}", reinterpret_cast<size_t>( conn->loop() ) , buf->ReadableBytes() );
-        std::string msg = buf->RetrieveAllAsString();
-        INFO( "msg = {}", msg );
-        conn->Send(msg);
+        DEBUG( "current loop = {},  The msg size = {}, time = {}", reinterpret_cast<size_t>( conn->loop() ) , buf->ReadableBytes() , string(time) );
+        // std::string msg = buf->RetrieveAllAsString();
+        // INFO( "msg = {}", msg );
+        conn->Send(buf);
         conn->Shutdown(); // 写端   EPOLLHUP =》 closeCallback_
         
     }

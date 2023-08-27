@@ -10,7 +10,6 @@
 #include "net/inet_address.h"
 #include "base/noncopyable.h"
 #include "base/timestamp.h"
-
 class Channel;
 class EventLoop;
 class SocketWrapper;
@@ -64,8 +63,10 @@ public:
     const InetAddress& peer_addr() const { return peer_addr_; }
     bool Connected() const { return state_ == kConnected; }
     bool Disconnected() const { return state_ == kDisconnected; }
+    void SetTcpNoDelay( bool flag ) ;
 
-    void Send( const string&  buf); // C++11
+    // void Send( const string&  buf); // C++11
+    void Send( Buffer* buf );
     // void Send(UnlimitedBuffer&& message); // C++11
     // void Send( const void* message, int len ); /* C++11是不是可以优化？ */
 
@@ -106,6 +107,8 @@ public:
     void ConnectEstablished(); /* 当新连接被accept 调用,只调一次 */
 
     void ConnectDestroyed(); /* 当新连接被移除调用,只调一次 */
+
+    
    
 
 private:
@@ -125,6 +128,7 @@ private:
     void HandleError();
     
     void SendInLoop(const void* message, size_t len);
+    void SendInLoop( const string& message );
     
     EventLoop* loop_; 
     const std::string name_;

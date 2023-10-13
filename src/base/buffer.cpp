@@ -16,7 +16,9 @@ const char Buffer::kCRLF[] = "\r\n";
 ssize_t Buffer::ReadFd(int fd, int *saveErrno)
 {
     // 栈额外空间，用于从套接字往出读时，当buffer_暂时不够用时暂存数据，待buffer_重新分配足够空间后，在把数据交换给buffer_。
-    char extrabuf[65536] = {0}; // 栈上内存空间 65536/1024 = 64KB
+    char extrabuf[65536]; // 栈上内存空间 65536/1024 = 64KB
+    // char extrabuf[65536] = {0};
+    // 重要：这里不要对额外栈空间先做初始化，不需要初始化，初始化是无用功
 
     /*
     struct iovec {

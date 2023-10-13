@@ -17,6 +17,7 @@ public:
             std::bind(&EchoTcpServer::onConnection, this, std::placeholders::_1)
         );
         server_.set_msg_callback(std::bind(&EchoTcpServer::onMessage, this, _1, _2, _3));
+        server_.set_thread_num( 1 );
     }
 
     void start() {
